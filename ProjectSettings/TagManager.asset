@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags: []
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - Ground
+  - 
+  - 
+  - 
+  - PlayerTrigger
+  - PlayerCollision
+  - 
+  - 
+  - 
+  - EnemyTrigger
+  - EnemyCollision
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 4185068265
+    locked: 0
+  - name: BackgroundProp
+    uniqueID: 1101142739
+    locked: 0
+  - name: Middleground
+    uniqueID: 1637434547
+    locked: 0
+  - name: MiddlegroundProp
+    uniqueID: 3677140377
+    locked: 0
+  - name: Foreground
+    uniqueID: 3220255479
+    locked: 0
+  - name: ForegroundProp
+    uniqueID: 811539925
+    locked: 0
+  - name: Player
+    uniqueID: 3493468011
+    locked: 0
