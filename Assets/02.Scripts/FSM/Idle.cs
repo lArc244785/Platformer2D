@@ -4,12 +4,18 @@ namespace Platformer.FSM.Character
 {
 	class Idle : CharacterStateBase
 	{
+		public Idle(CharacterMachine machine) : base(machine)
+		{
+		}
+
 		public override CharacterStateID id => CharacterStateID.Idle;
-		public Idle(StateMachine<CharacterStateID> machine) : base(machine) { }
+
 
 		public override void OnStateEnter()
 		{
 			base.OnStateEnter();
+			controller.isDirectionChangeable = true;
+			controller.isMoveable = true;
 			animator.Play("Idle");
 		}
 
@@ -20,9 +26,12 @@ namespace Platformer.FSM.Character
 				return id;
 
 			if (Mathf.Abs(controller.horizontoal) > 0f)
-				return CharacterStateID.Move;
+				nextID = CharacterStateID.Move;
+			if (!controller.isGrounded)
+				nextID = CharacterStateID.Fall;
 
-			return id;
+
+			return nextID;
 		}
 	}
 }

@@ -7,7 +7,6 @@ namespace Platformer.FSM
 {
 	public class StateMachine<T> where T : Enum
 	{
-		public CharacterController owner;
 		public T currentStateID;
 		protected Dictionary<T, IState<T>> states;
 
@@ -28,6 +27,11 @@ namespace Platformer.FSM
 			currentStateID = newStateID;
 			states[currentStateID].OnStateEnter();
 			return true;
+		}
+
+		public void UpdateState()
+		{
+			ChangeState(states[currentStateID].OnStateUpdate());
 		}
 	}
 }

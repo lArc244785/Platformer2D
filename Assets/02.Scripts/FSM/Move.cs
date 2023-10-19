@@ -4,20 +4,33 @@ namespace Platformer.FSM.Character
 {
 	class Move : CharacterStateBase
 	{
+		public Move(CharacterMachine machine) : base(machine)
+		{
+		}
+
 		public override CharacterStateID id => CharacterStateID.Move;
-		public Move(StateMachine<CharacterStateID> machine) : base(machine) { }
+
 
 		public override void OnStateEnter()
 		{
-			animator.Play("Move");
+			Debug.Log("Move");
+			animator.Play("Run");
+			controller.isDirectionChangeable = true;
+			controller.isMoveable = true;
 		}
 
 		public override CharacterStateID OnStateUpdate()
 		{
-			if (controller.horizontoal == 0f)
-				return CharacterStateID.Idle;
+			CharacterStateID nextID = base.OnStateUpdate();
+			if (nextID == CharacterStateID.None)
+				return id;
 
-			return id;
+			if (controller.horizontoal == 0f)
+				nextID = CharacterStateID.Idle;
+			if (!controller.isGrounded)
+				nextID = CharacterStateID.Fall;
+
+			return nextID;
 		}
 
 

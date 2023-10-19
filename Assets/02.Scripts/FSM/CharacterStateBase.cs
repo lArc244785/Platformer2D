@@ -23,19 +23,16 @@ namespace Platformer.FSM
 		Ladder,
 	}
 
-	public class CharacterStateBase : IState<CharacterStateID>
+	public abstract class CharacterStateBase : StateBase<CharacterStateID>
 	{
-		public virtual CharacterStateID id { get;}
 
-		public virtual bool canExecute => true;
-
-		protected StateMachine<CharacterStateID> machine;
+		protected CharacterMachine machine;
 		protected Transform transfrom;
 		protected Rigidbody2D rigidbody;
 		protected Animator animator;
 		protected CharacterController controller;
 
-		public CharacterStateBase(StateMachine<CharacterStateID> machine)
+		public CharacterStateBase(CharacterMachine machine) : base(machine)
 		{
 			this.machine = machine;
 			transfrom = machine.owner.transform;
@@ -43,21 +40,6 @@ namespace Platformer.FSM
 			animator = machine.owner.GetComponentInChildren<Animator>();
 			controller = machine.owner;
 		}
-
-		public virtual void OnStateEnter()
-		{
-		}
-		public virtual CharacterStateID OnStateUpdate()
-		{
-			return id;
-		}
-		public virtual void OnStateFixedUpdate()
-		{
-		}
-		public virtual void OnStateExit()
-		{
-		}
-
 	}
 
 
