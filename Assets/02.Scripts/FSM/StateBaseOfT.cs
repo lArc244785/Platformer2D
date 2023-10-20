@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 
 namespace Platformer.FSM
 {
@@ -7,6 +8,8 @@ namespace Platformer.FSM
 	{
 		public abstract T id { get; }
 		public virtual bool canExecute => true;
+
+		private bool _hasFixedUpdated;
 
 		protected StateMachine<T> machine;
 
@@ -17,6 +20,8 @@ namespace Platformer.FSM
 
 		public virtual void OnStateEnter()
 		{
+			UnityEngine.Debug.Log($"State Enter to {id}");
+			_hasFixedUpdated = false;
 		}
 
 		public virtual void OnStateExit()
@@ -25,11 +30,15 @@ namespace Platformer.FSM
 
 		public virtual void OnStateFixedUpdate()
 		{
-		}
+            if (!_hasFixedUpdated)
+            {
+				_hasFixedUpdated = true;
+            }
+        }
 
 		public virtual T OnStateUpdate()
 		{
-			return id;
+			return _hasFixedUpdated ? id : default(T);
 		}
 	}
 }

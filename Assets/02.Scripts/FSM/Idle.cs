@@ -16,6 +16,8 @@ namespace Platformer.FSM.Character
 			base.OnStateEnter();
 			controller.isDirectionChangeable = true;
 			controller.isMoveable = true;
+			controller.hasDoubleJumped = false;
+			controller.hasJumped = false;
 			animator.Play("Idle");
 		}
 

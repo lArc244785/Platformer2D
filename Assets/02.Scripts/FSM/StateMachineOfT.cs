@@ -2,6 +2,7 @@ using Platformer.Controllers;
 using CharacterControllor = Platformer.Controllers.CharacterController;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Platformer.FSM 
 {
@@ -9,20 +10,27 @@ namespace Platformer.FSM
 	{
 		public T currentStateID;
 		protected Dictionary<T, IState<T>> states;
-
+		protected bool _isDirty;
 		public void Init(IDictionary<T, IState<T>> copy)
 		{
 			//copy 해서 생성
 			states = new Dictionary<T, IState<T>> (copy);
+			currentStateID = states.First().Key;
+			states[currentStateID].OnStateEnter();
 		}
 
 		public bool ChangeState(T newStateID)
 		{
+			if (_isDirty)
+				return false;
+
 			if (Comparer<T>.Default.Compare(newStateID, currentStateID) == 0)
 				return false;
 			//바꾸려는 상태가 실행가능한지 확인하고 안되면 바꾸지 않음
 			if (!states[newStateID].canExecute)
 				return false;
+
+			_isDirty = true;
 			states[currentStateID].OnStateExit();
 			currentStateID = newStateID;
 			states[currentStateID].OnStateEnter();
@@ -33,5 +41,17 @@ namespace Platformer.FSM
 		{
 			ChangeState(states[currentStateID].OnStateUpdate());
 		}
+
+		public void FixedUpdateState()
+		{
+			states[currentStateID].OnStateFixedUpdate();
+		}
+
+
+		public void LateUpdateState()
+		{
+			_isDirty = false;
+		}
+		
 	}
 }

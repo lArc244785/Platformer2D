@@ -2,22 +2,20 @@ using UnityEngine;
 
 namespace Platformer.FSM.Character
 {
-	class Jump : CharacterStateBase
+	class DoubleJump : CharacterStateBase
 	{
 		private float _jumpForce;
 
 		public override bool canExecute => base.canExecute &&
-			(machine.currentStateID == CharacterStateID.Idle ||
-			machine.currentStateID == CharacterStateID.Move) &&
-			controller.isGrounded &&
-			!controller.hasJumped;
+			(machine.currentStateID == CharacterStateID.Jump || machine.currentStateID == CharacterStateID.Fall)&&
+			!controller.hasDoubleJumped;
 
-		public Jump(CharacterMachine machine, float jumpForce) : base(machine)
+		public DoubleJump(CharacterMachine machine, float jumpForce) : base(machine)
 		{
 			_jumpForce = jumpForce;
 		}
 
-		public override CharacterStateID id => CharacterStateID.Jump;
+		public override CharacterStateID id => CharacterStateID.DoubleJump;
 
 
 		public override void OnStateEnter()
@@ -28,11 +26,11 @@ namespace Platformer.FSM.Character
 			controller.isMoveable = false;
 
 			controller.hasJumped = true;
-			controller.hasDoubleJumped = false;
+			controller.hasDoubleJumped = true;
 
 			animator.Play("Jump");
 			rigidbody.velocity = new Vector2(rigidbody.velocity.x, 0.0f);
-			rigidbody.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);			
+			rigidbody.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
 		}
 
 		public override CharacterStateID OnStateUpdate()

@@ -1,25 +1,28 @@
-using UnityEngine;
-
 namespace Platformer.FSM.Character
 {
 	class Fall : CharacterStateBase
 	{
-		public Fall(CharacterMachine machine) : base(machine)
+		private float _fallStartY;
+		private float _landingDistance;
+		public Fall(CharacterMachine machine, float landingDistance) : base(machine)
 		{
+			_landingDistance = landingDistance;
 		}
 
 		public override CharacterStateID id => CharacterStateID.Fall;
-		public override bool canExecute => base.canExecute && 
-			(machine.currentStateID == CharacterStateID.Idle || 
-			machine.currentStateID == CharacterStateID.Move ||
-			machine.currentStateID == CharacterStateID.Jump);
+		public override bool canExecute => base.canExecute &&
+					(machine.currentStateID == CharacterStateID.Idle ||
+					 machine.currentStateID == CharacterStateID.Move ||
+					 machine.currentStateID == CharacterStateID.Jump || 
+					 machine.currentStateID == CharacterStateID.DoubleJump);
 
 		public override void OnStateEnter()
 		{
 			base.OnStateEnter();
 			controller.isMoveable = false;
 			controller.isDirectionChangeable = true;
-			animator.Play("Fall");
+ 			animator.Play("Fall");
+			_fallStartY = controller.transform.position.y;
 		}
 
 		public override CharacterStateID OnStateUpdate()
@@ -29,7 +32,14 @@ namespace Platformer.FSM.Character
 				return id;
 
 			if (controller.isGrounded)
-				nextID = CharacterStateID.Idle;
+			{
+				var fallDistacne = _fallStartY - controller.transform.position.y;
+				if (fallDistacne >= _landingDistance)
+					nextID = CharacterStateID.Land;
+				else
+					nextID = CharacterStateID.Idle;
+			}
+
 
 			return nextID;
 		}

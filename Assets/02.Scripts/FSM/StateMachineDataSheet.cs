@@ -13,8 +13,10 @@ namespace Platformer.FSM
 			{
 				{CharacterStateID.Idle, new Idle(machine)},
 				{CharacterStateID.Move, new Move(machine)},
-				{CharacterStateID.Fall, new Fall(machine)},
+				{CharacterStateID.Fall, new Fall(machine, 1.0f)},
 				{CharacterStateID.Jump, new Jump(machine, 3.7f)},
+				{CharacterStateID.Land, new Land(machine)},
+				{CharacterStateID.DoubleJump, new DoubleJump(machine, 2.7f)},
 			};
 		}
 	}

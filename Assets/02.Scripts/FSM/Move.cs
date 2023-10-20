@@ -13,7 +13,6 @@ namespace Platformer.FSM.Character
 
 		public override void OnStateEnter()
 		{
-			Debug.Log("Move");
 			animator.Play("Run");
 			controller.isDirectionChangeable = true;
 			controller.isMoveable = true;

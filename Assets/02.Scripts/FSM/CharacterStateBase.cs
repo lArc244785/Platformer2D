@@ -26,7 +26,7 @@ namespace Platformer.FSM
 	public abstract class CharacterStateBase : StateBase<CharacterStateID>
 	{
 
-		protected CharacterMachine machine;
+		//protected CharacterMachine machine;
 		protected Transform transfrom;
 		protected Rigidbody2D rigidbody;
 		protected Animator animator;
@@ -34,7 +34,7 @@ namespace Platformer.FSM
 
 		public CharacterStateBase(CharacterMachine machine) : base(machine)
 		{
-			this.machine = machine;
+			//this.machine = machine;
 			transfrom = machine.owner.transform;
 			rigidbody = machine.owner.GetComponent<Rigidbody2D>();
 			animator = machine.owner.GetComponentInChildren<Animator>();
