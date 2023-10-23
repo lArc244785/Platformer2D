@@ -19,12 +19,16 @@ namespace Platformer.Controllers
             machine.Init(machineData);
             OnHpMin += () => machine.ChangeState(CharacterStateID.Die);
             OnHpDepleted += (x) => machine.ChangeState(CharacterStateID.Hurt);
+
+            ani = GetComponentInChildren<Animator>();
         }
+
+        Animator ani;
 
         protected override void Update()
         {
             base.Update();
-            
+
             if (Input.GetKey(KeyCode.LeftAlt))
             {
                 if (machine.ChangeState(CharacterStateID.DownJump) == false &&
@@ -58,6 +62,9 @@ namespace Platformer.Controllers
 
             if (Input.GetKeyDown(KeyCode.D))
                 OnDamage(1);
+
+            if (Input.GetKeyDown(KeyCode.LeftShift))
+                machine.ChangeState(CharacterStateID.Dash);
 
 		}
 

@@ -20,6 +20,7 @@ namespace Platformer.FSM
 				{ CharacterStateID.WallSlide, new WallSlide(machine) },
                 { CharacterStateID.Hurt, new Hurt(machine)},
                 { CharacterStateID.Die, new Die(machine)},
+                { CharacterStateID.Dash, new Dash(machine)},
 			};
         }
     }

@@ -29,7 +29,6 @@ namespace Platformer.FSM.Character
 
             controller.Stop();
             _time = _hurtTime;
-            controller.invincible = true;
 
             animator.Play("Hurt");
         }
@@ -37,23 +36,19 @@ namespace Platformer.FSM.Character
         public override CharacterStateID OnStateUpdate()
         {
             CharacterStateID nextID = base.OnStateUpdate();
+            if (nextID == CharacterStateID.None)
+                return id;
 
-            //nextID = id;
+            _time -= Time.deltaTime;
+            Debug.Log(_time);
 
-			_time -= Time.deltaTime;
-            if(_time <= 0.0f)
+            if (_time <= 0.0f)
             {
                 nextID = CharacterStateID.Idle;
             }
 
             return nextID;
         }
-
-		public override void OnStateExit()
-		{
-			base.OnStateExit();
-			controller.invincible = false;
-		}
 
 	}
 }

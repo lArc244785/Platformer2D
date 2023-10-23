@@ -32,6 +32,9 @@ namespace Platformer.FSM.Character
         {
             CharacterStateID nextID = base.OnStateUpdate();
 
+            if (nextID == CharacterStateID.None)
+                return id;
+
             return nextID;
         }
 
