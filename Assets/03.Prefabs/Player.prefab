@@ -178,15 +178,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isDirectionChangeable: 1
-  isMoveable: 1
+  isMovable: 1
   move: {x: 0, y: 0}
   _moveSpeed: 1
+  ground: {fileID: 0}
+  groundBelow: {fileID: 0}
+  _groundDetectOffset: {x: 0, y: 0}
+  _groundDetectSize: {x: 0.1, y: 0.05}
+  _groundBelowDetectDistance: 0.5
   _groundMask:
     serializedVersion: 2
-    m_Bits: 0
-  _groundDetectOffset: {x: 0, y: 0}
-  _groundDetectSize: {x: 0, y: 0}
-  ground: {fileID: 0}
+    m_Bits: 64
+  hasJumped: 0
+  hasDoubleJumped: 0
 --- !u!1 &6889172280332186051
 GameObject:
   m_ObjectHideFlags: 0

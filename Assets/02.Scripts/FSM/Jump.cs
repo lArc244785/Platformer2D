@@ -1,52 +1,57 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Platformer.FSM.Character
 {
-	class Jump : CharacterStateBase
-	{
-		private float _jumpForce;
+    public class Jump : CharacterStateBase
+    {
+        public override CharacterStateID id => CharacterStateID.Jump;
+        public override bool canExecute => base.canExecute &&
+                                           controller.hasJumped == false &&
+                                            machine.currentStateID == CharacterStateID.WallSlide ||
+                                           ((machine.currentStateID == CharacterStateID.Idle ||
+                                            machine.currentStateID == CharacterStateID.Move ||
+                                            machine.currentStateID == CharacterStateID.WallSlide) &&
+                                           controller.isGrounded);
 
-		public override bool canExecute => base.canExecute &&
-			(machine.currentStateID == CharacterStateID.Idle ||
-			machine.currentStateID == CharacterStateID.Move) &&
-			controller.isGrounded &&
-			!controller.hasJumped;
+        private float _jumpForce;
 
-		public Jump(CharacterMachine machine, float jumpForce) : base(machine)
-		{
-			_jumpForce = jumpForce;
-		}
+        public Jump(CharacterMachine machine, float jumpForce)
+            : base(machine)
+        {
+            _jumpForce = jumpForce;
+        }
 
-		public override CharacterStateID id => CharacterStateID.Jump;
+        public override void OnStateEnter()
+        {
+            base.OnStateEnter();
+            controller.isDirectionChangeable = true;
+            controller.isMovable = false;
+            controller.hasJumped = true;
+            controller.hasDoubleJumped = false;
+            animator.Play("Jump");
 
+            float velocityX = rigidbody.velocity.x;
+            if (machine.prevStateID == CharacterStateID.WallSlide)
+            {
+                velocityX = controller.horizontal * controller.moveSpeed;
+			}
 
-		public override void OnStateEnter()
-		{
-			base.OnStateEnter();
+			rigidbody.velocity = new Vector2(velocityX, 0.0f);
 
-			controller.isDirectionChangeable = true;
-			controller.isMoveable = false;
+            rigidbody.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
+        }
 
-			controller.hasJumped = true;
-			controller.hasDoubleJumped = false;
+        public override CharacterStateID OnStateUpdate()
+        {
+            CharacterStateID nextID = base.OnStateUpdate();
 
-			animator.Play("Jump");
-			rigidbody.velocity = new Vector2(rigidbody.velocity.x, 0.0f);
-			rigidbody.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);			
-		}
+            if (nextID == CharacterStateID.None)
+                return id;
 
-		public override CharacterStateID OnStateUpdate()
-		{
-			CharacterStateID nextID = base.OnStateUpdate();
-			if (nextID == CharacterStateID.None)
-				return id;
+            if (rigidbody.velocity.y <= 0.0f)
+                nextID = CharacterStateID.Fall;
 
-			if (rigidbody.velocity.y <= 0.0f)
-				nextID = CharacterStateID.Fall;
-
-			return nextID;
-		}
-	}
+            return nextID;
+        }
+    }
 }
-
-

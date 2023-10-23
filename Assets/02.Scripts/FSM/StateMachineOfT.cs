@@ -1,57 +1,59 @@
-using Platformer.Controllers;
-using CharacterControllor = Platformer.Controllers.CharacterController;
-using System;
+ï»¿using System;
+using CharacterController = Platformer.Controllers.CharacterController;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Platformer.FSM 
+namespace Platformer.FSM
 {
-	public class StateMachine<T> where T : Enum
-	{
-		public T currentStateID;
-		protected Dictionary<T, IState<T>> states;
-		protected bool _isDirty;
-		public void Init(IDictionary<T, IState<T>> copy)
-		{
-			//copy ÇØ¼­ »ı¼º
-			states = new Dictionary<T, IState<T>> (copy);
-			currentStateID = states.First().Key;
-			states[currentStateID].OnStateEnter();
-		}
+    public class StateMachine<T>
+        where T : Enum
+    {
+        public T currentStateID;
+        public T prevStateID;
+        protected Dictionary<T, IState<T>> states;
+        private bool _isDirty;
 
-		public bool ChangeState(T newStateID)
-		{
-			if (_isDirty)
-				return false;
+        public void Init(IDictionary<T, IState<T>> copy)
+        {
+            states = new Dictionary<T, IState<T>>(copy);
+            currentStateID = states.First().Key;
+            states[currentStateID].OnStateEnter();
+        }
 
-			if (Comparer<T>.Default.Compare(newStateID, currentStateID) == 0)
-				return false;
-			//¹Ù²Ù·Á´Â »óÅÂ°¡ ½ÇÇà°¡´ÉÇÑÁö È®ÀÎÇÏ°í ¾ÈµÇ¸é ¹Ù²ÙÁö ¾ÊÀ½
-			if (!states[newStateID].canExecute)
-				return false;
+        public void UpdateState()
+        {
+            ChangeState(states[currentStateID].OnStateUpdate());
+        }
 
-			_isDirty = true;
-			states[currentStateID].OnStateExit();
-			currentStateID = newStateID;
-			states[currentStateID].OnStateEnter();
-			return true;
-		}
+        public void FixedUpdateState()
+        {
+            states[currentStateID].OnStateFixedUpdate();
+        }
 
-		public void UpdateState()
-		{
-			ChangeState(states[currentStateID].OnStateUpdate());
-		}
+        public void LateUpdateState()
+        {
+            _isDirty = false;
+        }
 
-		public void FixedUpdateState()
-		{
-			states[currentStateID].OnStateFixedUpdate();
-		}
+        public bool ChangeState(T newStateID)
+        {
+            if (_isDirty)
+                return false;
 
+            // ë°”ê¾¸ë ¤ëŠ” ìƒíƒœê°€ í˜„ì¬ ìƒíƒœì™€ ë™ì¼í•˜ë©´ ë°”ê¾¸ì§€ì•ŠìŒ
+            if (Comparer<T>.Default.Compare(newStateID, currentStateID) == 0)
+                return false;
 
-		public void LateUpdateState()
-		{
-			_isDirty = false;
-		}
-		
-	}
+            // ë°”ê¾¸ë ¤ëŠ” ìƒíƒœê°€ ì‹¤í–‰ê°€ëŠ¥í•˜ì§€ ì•Šë‹¤ë©´ ë°”ê¾¸ì§€ ì•ŠìŒ
+            if (states[newStateID].canExecute == false)
+                return false;
+
+            _isDirty = true;
+            states[currentStateID].OnStateExit(); // ê¸°ì¡´ ìƒíƒœì—ì„œ íƒˆì¶œ
+            prevStateID = currentStateID;
+			currentStateID = newStateID; // ìƒíƒœ ê°±ì‹ 
+            states[currentStateID].OnStateEnter(); // ìƒˆë¡œìš´ ìƒíƒœë¡œ ì§„ì…
+            return true;
+        }
+    }
 }

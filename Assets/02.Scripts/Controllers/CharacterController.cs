@@ -1,140 +1,272 @@
 using Platformer.FSM;
-using System.Collections;
-using System.Collections.Generic;
+using Platformer.Stats;
+using System;
+using System.Linq;
 using UnityEngine;
 
 namespace Platformer.Controllers
 {
-	public abstract class CharacterController : MonoBehaviour
-	{
-		public const int DIRACTION_RIGHT = 1;
-		public const int DIRACTION_LEFT = -1;
-
-		public abstract float horizontoal { get; }
-		public abstract float vertical { get; }
-
-		public int dircation
-		{
-			get => _dircation;
-			set
-			{
-				if (!isDirectionChangeable)
-					return;
-				if(value == _dircation) 
-					return;
-
-				if (value > 0)
-					_dircation = DIRACTION_RIGHT;
-				else if (value < 0)
-					_dircation = DIRACTION_LEFT;
-				else
-					throw new System.Exception($"[CharacterController] : Worong direction {_dircation}");
-
-				transform.localScale = new Vector3(1.0f * _dircation, 1.0f, 1.0f);
-			}
-		}
-		private int _dircation;
-		public bool isDirectionChangeable;
-		
-		public bool isMoveable;
-		public Vector2 move;
-		[SerializeField] private float _moveSpeed;
-		protected Rigidbody2D rig2D;
-
-		public bool isGrounded
-		{
-			get
-			{
-				ground = Physics2D.OverlapBox(
-					rig2D.position + _groundDetectOffset, 
-					_groundDetectSize, 
-					0f, 
-					_groundMask);
-
-				return ground;
-			}
-		}
-
-		[Header("Ground Detect"), SerializeField] private LayerMask _groundMask;
-		[SerializeField] private Vector2 _groundDetectOffset;
-		[SerializeField] private Vector2 _groundDetectSize;
-		public Collider2D ground;
-		[SerializeField] private float _groundBelowDetectDistance;
-
-
-		public bool hasJumped = false;
-		public bool hasDoubleJumped = false;
-		protected CharacterMachine machine;
-
-
-		protected virtual void Awake()
-		{
-			rig2D = GetComponent<Rigidbody2D>();
-		}
-
-		protected virtual void Update()
-		{
-			machine.UpdateState();
-
-			if (isMoveable)
+	public abstract class CharacterController : MonoBehaviour, IHP
+    {
+        public const int DIRECTION_RIGHT = 1;
+        public const int DIRECTION_LEFT = -1;
+        public int direction
+        {
+            get => _direction;
+            set
             {
-				move = new Vector2(horizontoal * _moveSpeed, 0.0f);
-            }
+                if (isDirectionChangeable == false)
+                    return;
 
-			if(Mathf.Abs(horizontoal) > 0.0f)
-				dircation = horizontoal < 0.0f ? DIRACTION_LEFT : DIRACTION_RIGHT;
+                if (value == _direction)
+                    return;
+
+                if (value > 0)
+                {
+                    _direction = DIRECTION_RIGHT;
+                    transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+                }
+                else if (value < 0)
+                {
+                    _direction = DIRECTION_LEFT;
+                    transform.localScale = new Vector3(-1.0f, 1.0f, 1.0f);
+                }
+                else
+                    throw new System.Exception("[CharacterController] : Wrong direction.");
+            }
+        }
+        private int _direction;
+        public bool isDirectionChangeable;
+
+        public abstract float horizontal { get; }
+        public abstract float vertical { get; }
+
+        public bool isMovable;
+        public Vector2 move;
+        [SerializeField] private float _moveSpeed;
+        public float moveSpeed => _moveSpeed;
+        protected Rigidbody2D rigidbody;
+        
+        //Ground Detection
+        public bool isGrounded
+        {
+            get
+            {
+                ground = Physics2D.OverlapBox(rigidbody.position + _groundDetectOffset,
+                                              _groundDetectSize,
+                                              0.0f,
+                                              _groundMask);
+                return ground;
+            }
         }
 
-		protected virtual void FixedUpdate()
-		{
-			machine.FixedUpdateState();
+        public bool isGroundBelowExist
+        {
+            get
+            {
+                Vector3 castStartPos = transform.position + (Vector3)_groundDetectOffset + Vector3.down * _groundDetectSize.y + Vector3.down * 0.01f;
+                RaycastHit2D[] hits =
+                    Physics2D.BoxCastAll(origin: castStartPos,
+                                         size: _groundDetectSize,
+                                         angle: 0.0f,
+                                         direction: Vector2.down,
+                                         distance: _groundBelowDetectDistance,
+                                         layerMask: _groundMask);
 
-			Move();
+                RaycastHit2D hit = default;
+                if (hits.Length > 0)
+                    hit = hits.FirstOrDefault(x => ground ?? x != ground);
+
+                groundBelow = hit.collider;
+                return groundBelow;
+            }
+        }
+
+        public Collider2D ground;
+        public Collider2D groundBelow;
+        [SerializeField] private Vector2 _groundDetectOffset;
+        [SerializeField] private Vector2 _groundDetectSize;
+        [SerializeField] private float _groundBelowDetectDistance;
+
+        [SerializeField] private LayerMask _groundMask;
+
+        //Wall Detection
+        public bool isWallDetected
+        {
+            get
+            {
+                RaycastHit2D topHit = Physics2D.Raycast(_wallTopCastCenter, Vector2.right * _direction, _wallDetectDistance, _wallMask);
+                RaycastHit2D bottomHit = Physics2D.Raycast(_wallBottomCastCenter, Vector2.right * _direction, _wallDetectDistance, _wallMask);
+				return topHit.collider && bottomHit.collider;
+            }
+        }
+
+        private Vector2 _wallTopCastCenter =>
+			rigidbody.position + Vector2.up * _col.size;
+        private Vector2 _wallBottomCastCenter => rigidbody.position;
+
+
+		[SerializeField] private LayerMask _wallMask;
+        [SerializeField] private float _wallDetectDistance;
+        private CapsuleCollider2D _col;
+
+        public bool hasJumped;
+        public bool hasDoubleJumped;
+
+        protected CharacterMachine machine;
+
+		public float hpValue
+        {
+            get => _hp;
+            set
+            {
+                if (value == _hp)
+                    return;
+
+                value = Mathf.Clamp(value, hpMin, hpMax);
+                _hp = value;
+
+                OnHpChanged?.Invoke(value);
+
+                if (value == hpMax)
+                    OnHpMax?.Invoke();
+                else if(value == hpMin)
+                    OnHpMin?.Invoke();
+
+            }
+        }
+
+		public float hpMax => _hpMax;
+
+		public float hpMin => 0.0f;
+
+		public bool invincible { get => _invincible; set => _invincible = value; }
+
+        private bool _invincible = false;
+		private float _hp;
+        [SerializeField] private float _hpMax;
+		public event Action<float> OnHpChanged;
+		public event Action<float> OnHpRecovered;
+		public event Action<float> OnHpDepleted;
+		public event Action OnHpMax;
+		public event Action OnHpMin;
+
+		public void Stop()
+        {
+            move = Vector2.zero; // 입력 0
+            rigidbody.velocity = Vector2.zero; // 속도 0
+        }
+
+        protected virtual void Awake()
+        {
+            _hp = _hpMax;
+			rigidbody = GetComponent<Rigidbody2D>();
+			_col = GetComponent<CapsuleCollider2D>();
 		}
 
-		protected virtual void LateUpdate()
+        protected virtual void Update()
+        {
+            machine.UpdateState();
+
+            if (isMovable)
+            {
+                move = new Vector2(horizontal * _moveSpeed, 0.0f);
+            }
+
+            if (Mathf.Abs(horizontal) > 0.0f)
+            {
+                direction = horizontal < 0.0f ? DIRECTION_LEFT : DIRECTION_RIGHT;
+            }
+        }
+
+        protected virtual void LateUpdate()
+        {
+            machine.LateUpdateState();
+        }
+
+        protected virtual void FixedUpdate()
+        {
+            machine.FixedUpdateState();
+
+            Move();
+        }
+
+        private void Move()
+        {
+            rigidbody.position += move * Time.fixedDeltaTime;
+        }
+
+        private void OnDrawGizmosSelected()
 		{
-			machine.LateUpdateState();
+			DrawGroundDetectGizmos();
+			DrawGoundBelowDetectGizmos();
+            DrawWallDetectGizmos();
 		}
 
-		private void Move()
+		private void DrawGoundBelowDetectGizmos()
 		{
-			rig2D.position += move * Time.fixedDeltaTime;
+			Vector3 castStartPos = transform.position + (Vector3)_groundDetectOffset + Vector3.down * _groundDetectSize.y + Vector3.down * 0.01f;
+			RaycastHit2D[] hits =
+				Physics2D.BoxCastAll(origin: castStartPos,
+									 size: _groundDetectSize,
+									 angle: 0.0f,
+									 direction: Vector2.down,
+									 distance: _groundBelowDetectDistance,
+									 layerMask: _groundMask);
+
+			RaycastHit2D hit = default;
+			if (hits.Length > 0)
+				hit = hits.FirstOrDefault(x => ground ?? x != ground);
+
+
+			Gizmos.color = Color.gray;
+			Gizmos.DrawWireCube(castStartPos, _groundDetectSize);
+			Gizmos.DrawWireCube(castStartPos + Vector3.down * _groundBelowDetectDistance, _groundDetectSize);
+			Gizmos.DrawLine(castStartPos + Vector3.left * _groundDetectSize.x / 2.0f,
+							castStartPos + Vector3.left * _groundDetectSize.x / 2.0f + Vector3.down * _groundBelowDetectDistance);
+			Gizmos.DrawLine(castStartPos + Vector3.right * _groundDetectSize.x / 2.0f,
+							castStartPos + Vector3.right * _groundDetectSize.x / 2.0f + Vector3.down * _groundBelowDetectDistance);
+
+			if (hit.collider != null)
+			{
+				Gizmos.color = Color.magenta;
+				Gizmos.DrawWireCube(castStartPos, _groundDetectSize);
+				Gizmos.DrawWireCube(castStartPos + Vector3.down * hit.distance, _groundDetectSize);
+				Gizmos.DrawLine(castStartPos + Vector3.left * _groundDetectSize.x / 2.0f,
+								castStartPos + Vector3.left * _groundDetectSize.x / 2.0f + Vector3.down * hit.distance);
+				Gizmos.DrawLine(castStartPos + Vector3.right * _groundDetectSize.x / 2.0f,
+								castStartPos + Vector3.right * _groundDetectSize.x / 2.0f + Vector3.down * hit.distance);
+			}
 		}
 
-
-		private void OnDrawGizmosSelected()
+		private void DrawGroundDetectGizmos()
 		{
 			Gizmos.color = Color.green;
 			Gizmos.DrawWireCube(transform.position + (Vector3)_groundDetectOffset, _groundDetectSize);
-
-			Vector3 castStartPos = transform.position + (Vector3)_groundDetectOffset + Vector3.down * _groundDetectSize.y;
-			RaycastHit2D hit =
-			Physics2D.BoxCast(origin: castStartPos,
-							  size: _groundDetectSize,
-							  angle: 0.0f,
-							  direction: Vector2.down,
-							  distance: _groundBelowDetectDistance,
-							  layerMask: _groundMask);
-
-
-			if(!hit.collider)
-			{
-				Gizmos.color = Color.magenta;
-				Gizmos.DrawWireCube(castStartPos + Vector3.down * hit.distance, _groundDetectSize);
-				Gizmos.DrawLine(castStartPos + Vector3.left * _groundDetectSize.x * 0.5f,
-								castStartPos + Vector3.left * _groundDetectSize.x * 0.5f + Vector3.down * hit.distance);
-			}
-
-			Gizmos.DrawWireCube(transform.position + (Vector3)_groundDetectOffset + Vector3.down * _groundDetectSize.y, _groundDetectSize);
-			Gizmos.DrawWireCube(transform.position + (Vector3)_groundDetectOffset + Vector3.down * _groundDetectSize.y + Vector3.down * _groundBelowDetectDistance, _groundDetectSize);
 		}
 
-		public void Stop()
+        private void DrawWallDetectGizmos()
+        {
+            rigidbody = GetComponent<Rigidbody2D>();
+            _col = GetComponent<CapsuleCollider2D>();
+            _direction = (int)Mathf.Sign(transform.localScale.x); 
+
+			Gizmos.color = Color.red;
+            Gizmos.DrawLine(_wallTopCastCenter, _wallTopCastCenter + Vector2.right * _wallDetectDistance * _direction);
+            Gizmos.DrawLine(_wallBottomCastCenter, _wallBottomCastCenter + Vector2.right * _wallDetectDistance * _direction);
+        }
+
+		public void RecoverHP(object subject, float amount)
 		{
-			move = Vector2.zero;
-			rig2D.velocity = Vector2.zero;
+            hpValue += amount;
+            OnHpRecovered?.Invoke(amount);
 		}
-	}
 
+		public void DepleteHp(object subject, float amount)
+		{
+			hpValue -= amount;
+            OnHpDepleted?.Invoke(amount);
+        }
+
+    }
 }

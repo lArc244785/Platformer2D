@@ -1,45 +1,40 @@
 using System;
-using System.Diagnostics;
 
 namespace Platformer.FSM
 {
-	public abstract class StateBase<T> : IState<T>
-		where T : Enum
-	{
-		public abstract T id { get; }
-		public virtual bool canExecute => true;
+    public abstract class StateBase<T> : IState<T>
+        where T : Enum
+    {
+        public abstract T id { get; }
 
-		private bool _hasFixedUpdated;
+        public virtual bool canExecute => true;
 
-		protected StateMachine<T> machine;
+        private bool _hasFixedUpdated;
 
-		public StateBase(StateMachine<T> machine)
-		{
-			this.machine = machine;
-		}
+        public StateBase(StateMachine<T> machine)
+        {
 
-		public virtual void OnStateEnter()
-		{
-			UnityEngine.Debug.Log($"State Enter to {id}");
-			_hasFixedUpdated = false;
-		}
-
-		public virtual void OnStateExit()
-		{
-		}
-
-		public virtual void OnStateFixedUpdate()
-		{
-            if (!_hasFixedUpdated)
-            {
-				_hasFixedUpdated = true;
-            }
         }
 
-		public virtual T OnStateUpdate()
-		{
-			return _hasFixedUpdated ? id : default(T);
-		}
-	}
-}
+        public virtual void OnStateEnter()
+        {
+            UnityEngine.Debug.Log($"State Entered to {id}");
+            _hasFixedUpdated = false;
+        }
 
+        public virtual void OnStateExit()
+        {
+        }
+
+        public virtual void OnStateFixedUpdate()
+        {
+            if (_hasFixedUpdated == false)
+                _hasFixedUpdated = true;
+        }
+
+        public virtual T OnStateUpdate()
+        {
+            return _hasFixedUpdated ? id : default(T);
+        }
+    }
+}
