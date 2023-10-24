@@ -19,11 +19,10 @@ namespace Platformer.FSM.Character
             base.OnStateEnter();
             controller.isDirectionChangeable = false;
             controller.isMovable = false;
-            controller.hasJumped = true;
-            controller.hasDoubleJumped = true;
 
             controller.Stop();
-            controller.invincible = true;
+            controller.enabled = false;
+            trigger.enabled = false;
 
             animator.Play("Die");
         }
@@ -34,6 +33,9 @@ namespace Platformer.FSM.Character
 
             if (nextID == CharacterStateID.None)
                 return id;
+
+            if(animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
+                GameObject.Destroy(controller.gameObject);
 
             return nextID;
         }

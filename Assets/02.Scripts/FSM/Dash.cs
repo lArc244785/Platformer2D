@@ -15,11 +15,11 @@ namespace Platformer.FSM.Character
             machine.currentStateID != CharacterStateID.Dash;
 
 
-        private float _ditance;
-        private float _speed;
+        private float _distance;
         private float _time;
 
-        private bool _enterUpdate = false;
+        private Vector2 _startPosition;
+        private Vector2 _targetPosition;
 
 		// 기반타입이 생성자 오버로드를 가지면,
 		// 하위타입에서 해당 오버로드에 인자를 전달할 수 있도록 파라미터들을 가지는 오버로드가 필요하다.
@@ -27,7 +27,7 @@ namespace Platformer.FSM.Character
 		public Dash(CharacterMachine machine , float distance = 1.0f)
             : base(machine)
         {
-            _ditance = distance;
+            _distance = distance;
         }
 
         public override void OnStateEnter()
@@ -41,9 +41,11 @@ namespace Platformer.FSM.Character
             controller.Stop();
 
             animator.Play("Dash");
-            _enterUpdate = false;
+            _startPosition = transform.position;
+			_targetPosition = _startPosition + (Vector2.right * (controller.direction * _distance));
 
-            rigidbody.bodyType = RigidbodyType2D.Kinematic;
+
+			rigidbody.bodyType = RigidbodyType2D.Kinematic;
 
         }
 
@@ -53,18 +55,32 @@ namespace Platformer.FSM.Character
             if (nextID == CharacterStateID.None)
                 return id;
 
-            if(!_enterUpdate)
-			{
-                _time = animator.GetCurrentAnimatorClipInfo(0)[0].clip.length;
-                _speed = _ditance / _time;
+
+			_time = animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
+            _time = Mathf.Log10(10 + _time * 90) - 1;
+            Vector2 expecfed= Vector2.Lerp(_startPosition, _targetPosition, _time);
+            bool isValid = true; 
+			//transform.position = Vector2.Lerp(_startPosition, _targetPosition, _time);
+
+            //if (_time >= 1.0f || controller.isWallDetected)
+            //    nextID = CharacterStateID.Idle;
 
 
-                _enterUpdate = true;
-            }
+            if(Physics2D.OverlapCapsule(
+                (Vector2)expecfed + trigger.offset, 
+                trigger.size, 
+                trigger.direction,
+                0.0f,
+                1 << LayerMask.NameToLayer("Wall")))
+            {
+                _targetPosition = transform.position;
+                isValid = false;
+			}
 
-            transform.position += Vector3.right * controller.direction * _speed * Time.deltaTime;
-            _time -= Time.deltaTime;
-            if (_time <= 0.0f || controller.isWallDetected)
+            if (isValid)
+                transform.position = expecfed;
+            
+            if (!isValid || _time >= 1.0f)
                 nextID = CharacterStateID.Idle;
 
             return nextID;

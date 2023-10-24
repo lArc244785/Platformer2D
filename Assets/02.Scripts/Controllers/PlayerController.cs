@@ -66,6 +66,24 @@ namespace Platformer.Controllers
             if (Input.GetKeyDown(KeyCode.LeftShift))
                 machine.ChangeState(CharacterStateID.Dash);
 
+
+            if(Mathf.Abs(vertical) > 0f)
+            {
+				if (isLadderUpDetected && upLadder.upExit.y > ladderExitY)
+				{
+					if (vertical < 0f && isGrounded)
+						return;
+
+					machine.ChangeState(CharacterStateID.LadderUp);
+				}
+				else if (isLadderDownDetected && downLadder.downExit.y < ladderExitY)
+				{
+					machine.ChangeState(CharacterStateID.LadderDown);
+				}
+
+			}
+
+
 		}
 
         private void OnDamage(float amount)

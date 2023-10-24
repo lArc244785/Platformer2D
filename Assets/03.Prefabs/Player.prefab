@@ -41,7 +41,7 @@ CapsuleCollider2D:
   m_GameObject: {fileID: 253915589676227958}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 27423dc58b2c168429cceef8e20a23a0, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -64,8 +64,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.00067329407, y: 0.15427545}
-  m_Size: {x: 0.10942936, y: 0.3060612}
+  m_Offset: {x: 0, y: 0.154}
+  m_Size: {x: 0.1, y: 0.3}
   m_Direction: 0
 --- !u!1 &6131659026841141376
 GameObject:
@@ -139,7 +139,7 @@ CapsuleCollider2D:
   m_GameObject: {fileID: 6131659026841141376}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 27423dc58b2c168429cceef8e20a23a0, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -162,8 +162,8 @@ CapsuleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.00067329407, y: 0.15427545}
-  m_Size: {x: 0.10942936, y: 0.3060612}
+  m_Offset: {x: 0, y: 0.154}
+  m_Size: {x: 0.1, y: 0.3}
   m_Direction: 0
 --- !u!114 &3746722025584539727
 MonoBehaviour:
@@ -184,13 +184,27 @@ MonoBehaviour:
   ground: {fileID: 0}
   groundBelow: {fileID: 0}
   _groundDetectOffset: {x: 0, y: 0}
-  _groundDetectSize: {x: 0.1, y: 0.05}
-  _groundBelowDetectDistance: 0.5
+  _groundDetectSize: {x: 0.05, y: 0.02}
+  _groundBelowDetectDistance: 0.75
   _groundMask:
     serializedVersion: 2
     m_Bits: 64
+  _wallMask:
+    serializedVersion: 2
+    m_Bits: 128
+  _wallDetectDistance: 0.06
+  upLadder: {fileID: 0}
+  downLadder: {fileID: 0}
+  _ladderUpDetectionOffset: 0.25
+  _ladderDownDetectionOffset: 0.05
+  _ladderDetectRadius: 0.01
+  _ladderMask:
+    serializedVersion: 2
+    m_Bits: 512
+  _ladderExitOffsetY: 0.155
   hasJumped: 0
   hasDoubleJumped: 0
+  _hpMax: 10
 --- !u!1 &6889172280332186051
 GameObject:
   m_ObjectHideFlags: 0

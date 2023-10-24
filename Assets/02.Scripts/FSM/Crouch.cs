@@ -12,9 +12,18 @@ namespace Platformer.FSM.Character
 
         private int _step;
 
-        public Crouch(CharacterMachine machine)
+        private Vector2 _originalColliderOffset;
+        private Vector2 _originalColliderSize;
+        private Vector2 _crouchedColliderOffset;
+        private Vector2 _crouchedColliderSize;
+
+        public Crouch(CharacterMachine machine, Vector2 crounchedCollideroffset, Vector2 crouchedColliderSize)
             : base(machine)
         {
+            _originalColliderOffset = trigger.offset;
+            _originalColliderSize = trigger.size;
+            _crouchedColliderOffset = crounchedCollideroffset;
+            _crouchedColliderSize = crouchedColliderSize;
         }
 
         public override void OnStateEnter()
@@ -23,8 +32,17 @@ namespace Platformer.FSM.Character
             controller.isDirectionChangeable = false;
             controller.isMovable = false;
             controller.Stop();
-            animator.Play("CrouchStart");
             _step = 0;
+
+            trigger.offset = _crouchedColliderOffset;
+            trigger.size = _crouchedColliderSize;
+
+            collision.offset = _crouchedColliderOffset;
+			collision.size = _crouchedColliderSize;
+
+
+
+            animator.Play("CrouchStart");
         }
 
         public override CharacterStateID OnStateUpdate()
@@ -56,5 +74,15 @@ namespace Platformer.FSM.Character
 
             return nextID;
         }
-    }
+
+		public override void OnStateExit()
+		{
+			base.OnStateExit();
+			trigger.offset = _originalColliderOffset;
+			trigger.size = _originalColliderSize;
+
+            collision.offset = _originalColliderOffset;
+			collision.size = _originalColliderSize;
+		}
+	}
 }

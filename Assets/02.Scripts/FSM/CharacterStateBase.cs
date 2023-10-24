@@ -23,7 +23,9 @@ namespace Platformer.FSM
         EdgeClimb,
         Ladder,
         Dash,
-    }
+        LadderUp,
+        LadderDown,
+	}
 
     public abstract class CharacterStateBase : StateBase<CharacterStateID>
     {

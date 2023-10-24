@@ -1,4 +1,5 @@
 using Platformer.FSM;
+using Platformer.GameElements;
 using Platformer.Stats;
 using System;
 using System.Linq;
@@ -46,9 +47,10 @@ namespace Platformer.Controllers
         [SerializeField] private float _moveSpeed;
         public float moveSpeed => _moveSpeed;
         protected Rigidbody2D rigidbody;
-        
-        //Ground Detection
-        public bool isGrounded
+
+		#region Ground Detection
+		//Ground Detection
+		public bool isGrounded
         {
             get
             {
@@ -89,9 +91,10 @@ namespace Platformer.Controllers
         [SerializeField] private float _groundBelowDetectDistance;
 
         [SerializeField] private LayerMask _groundMask;
-
-        //Wall Detection
-        public bool isWallDetected
+		#endregion
+		#region Wall Detection
+		//Wall Detection
+		public bool isWallDetected
         {
             get
             {
@@ -108,7 +111,54 @@ namespace Platformer.Controllers
 
 		[SerializeField] private LayerMask _wallMask;
         [SerializeField] private float _wallDetectDistance;
-        private CapsuleCollider2D _col;
+        #endregion
+
+        #region Ladder Detection
+        public bool isLadderUpDetected
+        {
+            get
+            {
+                Collider2D col = Physics2D.OverlapCircle(ladderUpDetectCenterPosition,
+                                                         _ladderDetectRadius,
+                                                         _ladderMask);
+                if (col)
+                {
+                    upLadder = col.GetComponent<Ladder>();
+                    return true;
+                }
+                return false;
+            }
+        }
+        public bool isLadderDownDetected
+        {
+            get
+            {
+                Collider2D col = Physics2D.OverlapCircle(ladderDownDetectCenterPosition,
+                                                         _ladderDetectRadius,
+                                                         _ladderMask);
+                if (col)
+                {
+                    downLadder = col.GetComponent<Ladder>();
+                    return true;
+                }
+                return false;
+            }
+        }
+        public float ladderExitY => transform.position.y + _ladderExitOffsetY;
+        private Vector2 ladderUpDetectCenterPosition => (Vector2)transform.position + Vector2.up * _ladderUpDetectionOffset;
+        private Vector2 ladderDownDetectCenterPosition => (Vector2)transform.position + Vector2.up * _ladderDownDetectionOffset;
+		public Ladder upLadder;
+        public Ladder downLadder;
+
+        [SerializeField] private float _ladderUpDetectionOffset;
+        [SerializeField] private float _ladderDownDetectionOffset;
+        [SerializeField] private float _ladderDetectRadius;
+        [SerializeField] private LayerMask _ladderMask;
+
+        [SerializeField] private float _ladderExitOffsetY;
+        #endregion
+
+		private CapsuleCollider2D _col;
 
         public bool hasJumped;
         public bool hasDoubleJumped;
@@ -201,6 +251,24 @@ namespace Platformer.Controllers
 			DrawGroundDetectGizmos();
 			DrawGoundBelowDetectGizmos();
             DrawWallDetectGizmos();
+            DrawLadderDetectGizmos();
+            DrawLadderExitGizmos();
+		}
+
+		private void DrawLadderExitGizmos()
+		{
+            Gizmos.color = Color.red;
+            Vector3 pos = transform.position;
+            pos.y = ladderExitY;
+            Gizmos.DrawSphere(pos, 0.008f);
+		}
+
+		private void DrawLadderDetectGizmos()
+		{
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawSphere(ladderUpDetectCenterPosition, _ladderDetectRadius);
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawSphere(ladderDownDetectCenterPosition, _ladderDetectRadius);
 		}
 
 		private void DrawGoundBelowDetectGizmos()

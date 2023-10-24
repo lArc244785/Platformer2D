@@ -1,5 +1,6 @@
 ﻿using Platformer.FSM.Character;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Platformer.FSM
 {
@@ -16,11 +17,13 @@ namespace Platformer.FSM
                 { CharacterStateID.DoubleJump, new DoubleJump(machine, 3.2f) },
                 { CharacterStateID.DownJump, new DownJump(machine) },
                 { CharacterStateID.Land, new Land(machine) },
-                { CharacterStateID.Crouch, new Crouch(machine) },
+                { CharacterStateID.Crouch, new Crouch(machine, new Vector2(0f,0.054f), new Vector2(0.1f,0.1f)) },
 				{ CharacterStateID.WallSlide, new WallSlide(machine) },
                 { CharacterStateID.Hurt, new Hurt(machine)},
                 { CharacterStateID.Die, new Die(machine)},
                 { CharacterStateID.Dash, new Dash(machine)},
+                { CharacterStateID.LadderUp, new LadderUp(machine)},
+                { CharacterStateID.LadderDown, new LadderDown(machine)},
 			};
         }
     }

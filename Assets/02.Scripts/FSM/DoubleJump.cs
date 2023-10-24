@@ -8,7 +8,9 @@ namespace Platformer.FSM.Character
         public override bool canExecute => base.canExecute &&
                                            controller.hasDoubleJumped == false &&
                                            (machine.currentStateID == CharacterStateID.Jump ||
-                                            machine.currentStateID == CharacterStateID.Fall);
+                                            machine.currentStateID == CharacterStateID.Fall ||
+                                            machine.currentStateID == CharacterStateID.LadderUp||
+                                            machine.currentStateID == CharacterStateID.LadderDown);
 
         private float _jumpForce;
 
