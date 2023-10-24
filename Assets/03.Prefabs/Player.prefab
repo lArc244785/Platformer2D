@@ -196,12 +196,12 @@ MonoBehaviour:
   upLadder: {fileID: 0}
   downLadder: {fileID: 0}
   _ladderUpDetectionOffset: 0.25
-  _ladderDownDetectionOffset: 0.05
-  _ladderDetectRadius: 0.01
+  _ladderDownDetectionOffset: -0.02
+  _ladderDetectRadius: 0.005
   _ladderMask:
     serializedVersion: 2
     m_Bits: 512
-  _ladderExitOffsetY: 0.155
+  _ladderExitOffsetY: 0.16
   hasJumped: 0
   hasDoubleJumped: 0
   _hpMax: 10

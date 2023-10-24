@@ -50,38 +50,29 @@ namespace Platformer.Controllers
                 machine.ChangeState(CharacterStateID.Idle);
             }
 
-            if (Input.GetKeyDown(KeyCode.DownArrow))
-            {
-                machine.ChangeState(CharacterStateID.Crouch);
-            }
-            else if (Input.GetKeyUp(KeyCode.DownArrow))
-            {
-                if (machine.currentStateID == CharacterStateID.Crouch)
-                    machine.ChangeState(CharacterStateID.Idle);
-            }
+            if (Input.GetKeyDown(KeyCode.Space))
+                machine.ChangeState(CharacterStateID.Slide);
 
-            if (Input.GetKeyDown(KeyCode.D))
+			if (Input.GetKeyDown(KeyCode.DownArrow))
+			{
+				machine.ChangeState(CharacterStateID.Crouch);
+			}
+			else if (Input.GetKeyUp(KeyCode.DownArrow))
+			{
+				if (machine.currentStateID == CharacterStateID.Crouch)
+					machine.ChangeState(CharacterStateID.Idle);
+			}
+
+			if (Input.GetKeyDown(KeyCode.D))
                 OnDamage(1);
 
             if (Input.GetKeyDown(KeyCode.LeftShift))
                 machine.ChangeState(CharacterStateID.Dash);
 
-
-            if(Mathf.Abs(vertical) > 0f)
-            {
-				if (isLadderUpDetected && upLadder.upExit.y > ladderExitY)
-				{
-					if (vertical < 0f && isGrounded)
-						return;
-
-					machine.ChangeState(CharacterStateID.LadderUp);
-				}
-				else if (isLadderDownDetected && downLadder.downExit.y < ladderExitY)
-				{
-					machine.ChangeState(CharacterStateID.LadderDown);
-				}
-
-			}
+            if (Input.GetKeyDown(KeyCode.UpArrow) && isLadderUpDetected)
+                machine.ChangeState(CharacterStateID.LadderUp);
+            if (Input.GetKeyDown(KeyCode.DownArrow) && isLadderDownDetected)
+                machine.ChangeState(CharacterStateID.LadderDown);
 
 
 		}
