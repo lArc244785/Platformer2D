@@ -516,10 +516,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 545d8335175bdf64582507a6ab8c61ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _upEnterOffset: 0.03
-  _upExitOffset: 0.03
-  _downEnterOffset: 0.05
-  _downExitOffset: 0.05
+  _upEnterOffset: -0.05
+  _upExitOffset: 0.05
+  _downEnterOffset: 0.08
+  _downExitOffset: 0.08
+  _groundOffset: 0.08
 --- !u!1 &9096159636816834283
 GameObject:
   m_ObjectHideFlags: 0

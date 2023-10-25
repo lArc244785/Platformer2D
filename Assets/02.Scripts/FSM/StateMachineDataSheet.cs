@@ -25,6 +25,8 @@ namespace Platformer.FSM
                 { CharacterStateID.Dash, new Dash(machine)},
                 { CharacterStateID.LadderUp, new LadderUp(machine)},
                 { CharacterStateID.LadderDown, new LadderDown(machine)},
+                { CharacterStateID.UpLadderClimb, new UpLadderClimb(machine)},
+                { CharacterStateID.DownLadderClimb, new DownLadderClimb(machine)},
 			};
         }
     }

@@ -12,7 +12,7 @@ namespace Platformer.FSM.Character
         private float _speed;
   
 		private Vector3 _renderOriginLocalPos;
-        private Vector3 _renderLadderLocalPos = new Vector3(0.03f, 0.16f, 0f);
+        private Vector3 _renderLadderLocalPos = new Vector3(0.033f, 0.16f, 0f);
 
         private Ladder _ladder;
 
@@ -61,7 +61,7 @@ namespace Platformer.FSM.Character
 
             animator.speed = controller.vertical > 0f ? 1.0f : 0.0f;
 
-            if (!controller.isLadderUpDetected)
+            if (controller.ladderExitY >= _ladder.upExit.y)
 			{
                 transform.position = _ladder.upExit;
                nextID = CharacterStateID.Idle;

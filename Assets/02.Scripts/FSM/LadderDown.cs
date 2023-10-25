@@ -7,13 +7,10 @@ namespace Platformer.FSM.Character
 	{
 		public override CharacterStateID id => CharacterStateID.LadderDown;
 		public override bool canExecute => base.canExecute &&
-			machine.currentStateID != CharacterStateID.LadderDown &&
-			machine.currentStateID != CharacterStateID.Jump &&
-			machine.currentStateID != CharacterStateID.DoubleJump &&
-			machine.currentStateID != CharacterStateID.Fall &&
 			//땅에 있는 경우 또는 이미 사다리를 타고 있는 경우
 			(machine.currentStateID == CharacterStateID.Idle ||
 			 machine.currentStateID == CharacterStateID.Move || 
+			machine.currentStateID == CharacterStateID.Crouch ||
 			machine.currentStateID == CharacterStateID.LadderUp);
 
 		private float _speed;
@@ -21,7 +18,7 @@ namespace Platformer.FSM.Character
 		private Ladder _ladder;
 
 		private Vector3 _renderOriginLocalPos;
-		private Vector3 _renderLadderLocalPos = new Vector3(0.03f, 0.16f, 0f);
+		private Vector3 _renderLadderLocalPos = new Vector3(0.033f, 0.16f, 0f);
 
 		public LadderDown(CharacterMachine machine, float speed = 0.3f)
 			: base(machine)
@@ -64,7 +61,7 @@ namespace Platformer.FSM.Character
 
 			if (controller.isGrounded)
 				nextID = CharacterStateID.Idle;
-			else if (!controller.isLadderDownDetected)
+			else if (controller.ladderExitY <= _ladder.downExit.y)
 			{
 				transform.position = _ladder.downExit;
 				nextID = CharacterStateID.Idle;
