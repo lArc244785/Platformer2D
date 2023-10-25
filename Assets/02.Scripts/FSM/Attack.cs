@@ -103,9 +103,19 @@ namespace Platformer.FSM.Character
 									 setting.castDistance,
 									 setting.targetMask);
 
-			Vector2 center = rigidbody.position + new Vector2(setting.castCenter.x * controller.direction, setting.castCenter.y);
+			Vector2 origin = rigidbody.position + new Vector2(setting.castCenter.x * controller.direction, setting.castCenter.y);
 			Vector2 size = setting.castSize;
 			float distance = setting.castDistance;
+
+			Vector2 lt = origin + new Vector2(-setting.castSize.x * 0.5f, setting.castSize.y * 0.5f);
+			Vector2 rt = origin + new Vector2(setting.castSize.x * 0.5f, setting.castSize.y * 0.5f);
+			Vector2 lb = origin + new Vector2(-setting.castSize.x * 0.5f, -setting.castSize.y * 0.5f);
+			Vector2 rb = origin + new Vector2(setting.castSize.x * 0.5f, -setting.castSize.y * 0.5f);
+
+			Debug.DrawLine(lt, rt);
+			Debug.DrawLine(rt, rb);
+			Debug.DrawLine(rb, lb);
+			Debug.DrawLine(lb, rt);
 
 			//탐색된 타겟들에서 정해진 타겟수까지만 공격 대상으로 선정
 			_targets.Clear();
