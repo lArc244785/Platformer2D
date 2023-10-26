@@ -177,6 +177,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2da2286897cbcfa489bd45a3414f6ddc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  damageMin: 0
+  damageMax: 0
   isDirectionChangeable: 1
   isMovable: 1
   move: {x: 0, y: 0}
@@ -186,7 +188,7 @@ MonoBehaviour:
   _groundDetectOffset: {x: 0, y: 0}
   _groundDetectSize: {x: 0.05, y: 0.02}
   _groundBelowDetectDistance: 0.75
-  _groundMask:
+  groundMask:
     serializedVersion: 2
     m_Bits: 64
   _wallMask:
@@ -204,7 +206,7 @@ MonoBehaviour:
   _ladderExitOffsetY: 0.16
   hasJumped: 0
   hasDoubleJumped: 0
-  _hpMax: 10
+  _hpMax: 100
 --- !u!1 &6889172280332186051
 GameObject:
   m_ObjectHideFlags: 0

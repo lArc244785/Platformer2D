@@ -4,6 +4,7 @@ using Platformer.Stats;
 using System.Collections.Generic;
 using UnityEditorInternal;
 using UnityEngine;
+using Platfomer.Datum;
 
 namespace Platformer.FSM.Character
 {
@@ -27,7 +28,7 @@ namespace Platformer.FSM.Character
 				}
 
 				//공격 최대 콤보인 경우 False
-				if (_comboStack > _comboResetTime)
+				if (_comboStack >= _comboStackMax)
 					return false;
 
 				//콤보가 0 이거나 0이상에서 피격을 시켰을 경우에는 True
@@ -54,23 +55,13 @@ namespace Platformer.FSM.Character
 
 		private CharacterAnimationEvents _animationEvent;
 
-		public class AttackSetting
-		{
-			public int targetMax;
-			public LayerMask targetMask;
-			public float damageGain;
-			public Vector2 castCenter;
-			public Vector2 castSize;
-			public float castDistance;
-		}
-
-		private AttackSetting[] _attackSettings;
+		private SkillCastSetting[] _skillCastSettings;
 		private List<IHP> _targets = new();
 
-		public Attack(CharacterMachine machine, AttackSetting[] attackSettings, float comboResetTime) : base(machine)
+		public Attack(CharacterMachine machine, float comboResetTime, SkillCastSetting[] skillcastSetting) : base(machine)
 		{
-			_attackSettings = attackSettings;
-			_comboStackMax = attackSettings.Length - 1;
+			_skillCastSettings = skillcastSetting;
+			_comboStackMax = skillcastSetting.Length;
 			_comboResetTime = comboResetTime;
 			_animationEvent = animator.GetComponent<CharacterAnimationEvents>();
 			//targets가 있다는 전제로함
@@ -81,7 +72,7 @@ namespace Platformer.FSM.Character
 					if (target == null)
 						continue;
 
-					float damage = Random.Range(controller.damageMin, controller.damageMax) * _attackSettings[_comboStack - 1].damageGain;
+					float damage = Random.Range(controller.damageMin, controller.damageMax) * _skillCastSettings[_comboStack - 1].damageGain;
 					target.DepleteHp(controller, damage);
 				}
 				_hasHit = true;
@@ -94,7 +85,7 @@ namespace Platformer.FSM.Character
 			controller.isDirectionChangeable = false;
 			controller.isMovable = controller.isGrounded;
 
-			AttackSetting setting = _attackSettings[_comboStack - 1];
+			SkillCastSetting setting = _skillCastSettings[_comboStack];
 			var hits2D =
 				Physics2D.BoxCastAll(rigidbody.position + new Vector2(setting.castCenter.x * controller.direction, setting.castCenter.y),
 									 setting.castSize,
@@ -107,15 +98,23 @@ namespace Platformer.FSM.Character
 			Vector2 size = setting.castSize;
 			float distance = setting.castDistance;
 
-			Vector2 lt = origin + new Vector2(-setting.castSize.x * 0.5f, setting.castSize.y * 0.5f);
-			Vector2 rt = origin + new Vector2(setting.castSize.x * 0.5f, setting.castSize.y * 0.5f);
-			Vector2 lb = origin + new Vector2(-setting.castSize.x * 0.5f, -setting.castSize.y * 0.5f);
-			Vector2 rb = origin + new Vector2(setting.castSize.x * 0.5f, -setting.castSize.y * 0.5f);
 
-			Debug.DrawLine(lt, rt);
-			Debug.DrawLine(rt, rb);
-			Debug.DrawLine(rb, lb);
-			Debug.DrawLine(lb, rt);
+			// L-T -> R-T
+			Debug.DrawLine(origin + new Vector2(-size.x / 2.0f * controller.direction, +size.y / 2.0f),
+						   origin + new Vector2(+size.x / 2.0f * controller.direction, +size.y / 2.0f) + Vector2.right * controller.direction * distance,
+						   Color.red, animator.GetCurrentAnimatorClipInfo(0).Length);
+			// L-B -> R-B
+			Debug.DrawLine(origin + new Vector2(-size.x / 2.0f * controller.direction, -size.y / 2.0f),
+						   origin + new Vector2(+size.x / 2.0f * controller.direction, -size.y / 2.0f) + Vector2.right * controller.direction * distance,
+						   Color.red, animator.GetCurrentAnimatorClipInfo(0).Length);
+			// L-T -> L-B
+			Debug.DrawLine(origin + new Vector2(-size.x / 2.0f * controller.direction, +size.y / 2.0f),
+						   origin + new Vector2(-size.x / 2.0f * controller.direction, -size.y / 2.0f),
+						   Color.red, animator.GetCurrentAnimatorClipInfo(0).Length);
+			// R-T -> R-B
+			Debug.DrawLine(origin + new Vector2(+size.x / 2.0f * controller.direction, +size.y / 2.0f) + Vector2.right * controller.direction * distance,
+						   origin + new Vector2(+size.x / 2.0f * controller.direction, -size.y / 2.0f) + Vector2.right * controller.direction * distance,
+						   Color.red, animator.GetCurrentAnimatorClipInfo(0).Length);
 
 			//탐색된 타겟들에서 정해진 타겟수까지만 공격 대상으로 선정
 			_targets.Clear();
@@ -130,6 +129,7 @@ namespace Platformer.FSM.Character
 			}
 
 			animator.SetFloat("ComboStack", _comboStack++);
+			Debug.Log(_comboStack);
 			animator.Play("Attack");
 		}
 

@@ -295,7 +295,7 @@ AnimatorController:
   m_Name: Player
   serializedVersion: 5
   m_AnimatorParameters:
-  - m_Name: attackComboStack
+  - m_Name: ComboStack
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
@@ -454,7 +454,7 @@ BlendTree:
     m_CycleOffset: 0
     m_DirectBlendParameter: attackComboStack
     m_Mirror: 0
-  m_BlendParameter: attackComboStack
+  m_BlendParameter: ComboStack
   m_BlendParameterY: attackComboStack
   m_MinThreshold: 0
   m_MaxThreshold: 1

@@ -9,23 +9,35 @@ namespace Platformer.Controllers
 
 		public override float vertical => Input.GetAxis("Vertical");
 
+		private float _invincibleTimer;
 
-		private void Start()
+		public void SetInvincible(float duration)
 		{
+			if (_invincibleTimer < duration)
+				return;
+			_invincibleTimer = duration;
+		}
+
+		protected override void Start()
+		{
+			base.Start();
 			machine = new PlayerMachine(this);
 			var machineData = StateMachineDataSheet.GetPlayerData(machine);
 			machine.Init(machineData);
 			OnHpMin += () => machine.ChangeState(CharacterStateID.Die);
 			OnHpDepleted += (x) => machine.ChangeState(CharacterStateID.Hurt);
-
-			ani = GetComponentInChildren<Animator>();
 		}
-
-		Animator ani;
 
 		protected override void Update()
 		{
 			base.Update();
+
+			if(_invincibleTimer > 0)
+			{
+				_invincibleTimer -= Time.deltaTime;
+				if (_invincibleTimer <= 0.0f)
+					invincible = false;
+			}
 
 			if (Input.GetKey(KeyCode.LeftAlt))
 			{
@@ -73,10 +85,8 @@ namespace Platformer.Controllers
 			if (Input.GetKeyDown(KeyCode.LeftShift))
 				machine.ChangeState(CharacterStateID.Dash);
 
-			//if (Input.GetKeyDown(KeyCode.UpArrow) && isLadderUpDetected)
-			//	machine.ChangeState(CharacterStateID.LadderUp);
-
-
+			if (Input.GetKey(KeyCode.LeftControl))
+				machine.ChangeState(CharacterStateID.Attack);
 
 		}
 
@@ -86,6 +96,20 @@ namespace Platformer.Controllers
 				return;
 
 			DepleteHp(null, 1);
+		}
+
+		public override void DepleteHp(object subject, float amount)
+		{
+			base.DepleteHp(subject, amount);
+
+			SetInvincible(0.7f);
+
+			if (subject.GetType().Equals(typeof(Transform)))
+			{
+				Transform target = (Transform)subject;
+				float dir = target.position.x - transform.position.x < 0 ? 1.0f : -1.0f;
+				Knockback(Vector2.right * dir * 1.0f + Vector2.up * 1.0f);
+			}
 		}
 
 	}
