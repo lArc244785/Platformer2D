@@ -12,6 +12,7 @@ namespace Platformer.FSM.Character
         {
         }
 
+
         public override void OnStateEnter()
         {
             base.OnStateEnter();

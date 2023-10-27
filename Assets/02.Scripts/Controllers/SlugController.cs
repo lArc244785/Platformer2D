@@ -1,6 +1,6 @@
 using Platformer.FSM;
 
-namespace Platfomer.Controllers
+namespace Platformer.Controllers
 {
 	public class SlugController : EnemyController
 	{
@@ -11,8 +11,8 @@ namespace Platfomer.Controllers
 			machine = new EnemyMachine(this);
 			var machineData = StateMachineDataSheet.GetSlugData(machine);
 			machine.Init(machineData);
-			OnHpMin += () => machine.ChangeState(CharacterStateID.Die);
-			OnHpDepleted += (x) => machine.ChangeState(CharacterStateID.Hurt);
+			onHpMin += () => machine.ChangeState(CharacterStateID.Die);
+			onHpDepleted += (x) => machine.ChangeState(CharacterStateID.Hurt);
 		}
 	}
 }

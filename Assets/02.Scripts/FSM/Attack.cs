@@ -4,7 +4,7 @@ using Platformer.Stats;
 using System.Collections.Generic;
 using UnityEditorInternal;
 using UnityEngine;
-using Platfomer.Datum;
+using Platformer.Datum;
 
 namespace Platformer.FSM.Character
 {
@@ -73,7 +73,7 @@ namespace Platformer.FSM.Character
 						continue;
 
 					float damage = Random.Range(controller.damageMin, controller.damageMax) * _skillCastSettings[_comboStack - 1].damageGain;
-					target.DepleteHp(controller, damage);
+					target.DepleteHp(transform, damage);
 				}
 				_hasHit = true;
 			};

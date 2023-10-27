@@ -9,11 +9,11 @@ namespace Platformer.Stats
 		float hpMax { get; }
 		float hpMin { get; }
 
-		public event Action<float> OnHpChanged;
-		public event Action<float> OnHpRecovered;
-		public event Action<float> OnHpDepleted;
-		public event Action OnHpMax;
-		public event Action OnHpMin;
+		public event Action<float> onHpChanged;
+		public event Action<float> onHpRecovered;
+		public event Action<float> onHpDepleted;
+		public event Action onHpMax;
+		public event Action onHpMin;
 
 		public void RecoverHP(object subject, float amount);
 		public void DepleteHp(object subject, float amount);

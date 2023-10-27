@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Platfomer.Datum
+namespace Platformer.Datum
 {
 	[CreateAssetMenu(fileName = "new SkillCastSetting", menuName = "Platformer/ScriptableObjects/SkillCaseSetting")]
 	public class SkillCastSetting : ScriptableObject

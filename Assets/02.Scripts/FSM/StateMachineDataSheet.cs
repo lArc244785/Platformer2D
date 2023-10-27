@@ -1,4 +1,4 @@
-﻿using Platfomer.Datum;
+﻿using Platformer.Datum;
 using Platformer.FSM.Character;
 using System.Collections.Generic;
 using UnityEngine;

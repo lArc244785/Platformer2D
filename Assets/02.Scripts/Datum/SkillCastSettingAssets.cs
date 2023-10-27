@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Platfomer.Datum
+namespace Platformer.Datum
 {
 	public class SkillCastSettingAssets : MonoBehaviour
 	{

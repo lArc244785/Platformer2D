@@ -1,3 +1,4 @@
+using Platformer.Effects;
 using Platformer.FSM;
 using Platformer.GameElements;
 using Platformer.Stats;
@@ -37,9 +38,11 @@ namespace Platformer.Controllers
 				}
 				else
 					throw new System.Exception("[CharacterController] : Wrong direction.");
+				onDirectionChanged?.Invoke(_direction);
 			}
 		}
 		private int _direction;
+		public event Action<int> onDirectionChanged;
 		public bool isDirectionChangeable;
 
 		public abstract float horizontal { get; }
@@ -60,7 +63,7 @@ namespace Platformer.Controllers
 				ground = Physics2D.OverlapBox(rigidbody.position + _groundDetectOffset,
 											  _groundDetectSize,
 											  0.0f,
-											  _groundMask);
+											  groundMask);
 				return ground;
 			}
 		}
@@ -76,7 +79,7 @@ namespace Platformer.Controllers
 										 angle: 0.0f,
 										 direction: Vector2.down,
 										 distance: _groundBelowDetectDistance,
-										 layerMask: _groundMask);
+										 layerMask: groundMask);
 
 				RaycastHit2D hit = default;
 				if (hits.Length > 0)
@@ -93,7 +96,7 @@ namespace Platformer.Controllers
 		[SerializeField] private Vector2 _groundDetectSize;
 		[SerializeField] private float _groundBelowDetectDistance;
 
-		[SerializeField] protected LayerMask _groundMask;
+		[SerializeField] protected LayerMask groundMask;
 		#endregion
 
 		#region Wall Detection
@@ -180,12 +183,12 @@ namespace Platformer.Controllers
 				value = Mathf.Clamp(value, hpMin, hpMax);
 				_hp = value;
 
-				OnHpChanged?.Invoke(value);
+				onHpChanged?.Invoke(value);
 
 				if (value == hpMax)
-					OnHpMax?.Invoke();
+					onHpMax?.Invoke();
 				else if (value == hpMin)
-					OnHpMin?.Invoke();
+					onHpMin?.Invoke();
 
 			}
 		}
@@ -199,11 +202,13 @@ namespace Platformer.Controllers
 		private bool _invincible = false;
 		private float _hp;
 		[SerializeField] private float _hpMax;
-		public event Action<float> OnHpChanged;
-		public event Action<float> OnHpRecovered;
-		public event Action<float> OnHpDepleted;
-		public event Action OnHpMax;
-		public event Action OnHpMin;
+		public event Action<float> onHpChanged;
+		public event Action<float> onHpRecovered;
+		public event Action<float> onHpDepleted;
+		public event Action onHpMax;
+		public event Action onHpMin;
+
+		public PoolOfDamagePopUp poolOfDamagePopUp;
 
 		public void Stop()
 		{
@@ -287,7 +292,7 @@ namespace Platformer.Controllers
 									 angle: 0.0f,
 									 direction: Vector2.down,
 									 distance: _groundBelowDetectDistance,
-									 layerMask: _groundMask);
+									 layerMask: groundMask);
 
 			RaycastHit2D hit = default;
 			if (hits.Length > 0)
@@ -334,13 +339,20 @@ namespace Platformer.Controllers
 		public void RecoverHP(object subject, float amount)
 		{
 			hpValue += amount;
-			OnHpRecovered?.Invoke(amount);
+			onHpRecovered?.Invoke(amount);
 		}
 
 		public virtual void DepleteHp(object subject, float amount)
 		{
+			if (invincible)
+				return;
+
 			hpValue -= amount;
-			OnHpDepleted?.Invoke(amount);
+			onHpDepleted?.Invoke(amount);
+
+			var damagePopUp = poolOfDamagePopUp.pool.Get();
+			damagePopUp.transform.position = transform.position + Vector3.up * 0.5f;
+			damagePopUp.Show(amount);
 		}
 
 		public void Knockback(Vector2 forece)

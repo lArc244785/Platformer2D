@@ -2,16 +2,16 @@ using Platformer.FSM;
 using Platformer.Stats;
 using System.Collections.Generic;
 using UnityEngine;
-using CharacterController = Platformer.Controllers.CharacterController;
-namespace Platfomer.Controllers
-{
+using Random = UnityEngine.Random;
 
+namespace Platformer.Controllers
+{
 	public enum AI
 	{
 		None,
 		Think,
-		ExcuteRandomBehaviour,
-		WaitUnitBehaviour,
+		ExectueRandomBehaviour,
+		WaitUntilBehaviour,
 		Follow,
 	}
 
@@ -26,7 +26,7 @@ namespace Platfomer.Controllers
 
 		[SerializeField] private AI _ai;
 		private Transform _target;
-		[SerializeField] protected float _targetDetectRange;
+		[SerializeField] private float _targetDetectRange;
 		[SerializeField] private bool _autoFollow;
 		[SerializeField] private bool _attackEnabled;
 		[SerializeField] private float _attackRange;
@@ -35,42 +35,42 @@ namespace Platfomer.Controllers
 		[SerializeField] private float _behaviourTimeMin;
 		[SerializeField] private float _behaviourTimeMax;
 		private float _behaviourTimer;
+		[SerializeField] private float _slopeAngle = 45.0f;
 
 		private CapsuleCollider2D _trigger;
-
-		[SerializeField] private Vector2 _forwardGroundDetectOffset;
-		[SerializeField] private float _forwardGroundDetectDistance;
-
-		private bool isForwardGroundDetect =>
-			Physics2D.Raycast((Vector2)transform.position +new Vector2(_forwardGroundDetectOffset.x * direction, _forwardGroundDetectOffset.y) ,
-							   Vector2.down,
-							   _forwardGroundDetectDistance, _groundMask);
 
 		protected override void Awake()
 		{
 			base.Awake();
 			_trigger = GetComponent<CapsuleCollider2D>();
+			_ai = AI.Think;
 		}
-
 
 		protected override void Update()
 		{
-			base.Update();
 			UpdateAI();
+
+			base.Update();
 		}
 
 		private void UpdateAI()
 		{
+			// 자동 따라가기 옵션이 켜져있는데
 			if (_autoFollow)
 			{
+				// 타겟이 없으면
 				if (_target == null)
 				{
-					var col = Physics2D.OverlapCircle(rigidbody.position, _targetDetectRange, _targetMask);
+					// 타겟 감지
+					Collider2D col
+						= Physics2D.OverlapCircle(rigidbody.position, _targetDetectRange, _targetMask);
+
 					if (col)
 						_target = col.transform;
 				}
 			}
 
+			// 타겟이 감지되었으면 따라가야함
 			if (_target)
 			{
 				_ai = AI.Follow;
@@ -78,74 +78,108 @@ namespace Platfomer.Controllers
 
 			switch (_ai)
 			{
-				case AI.None:
-					break;
 				case AI.Think:
+					{
+						_ai = AI.ExectueRandomBehaviour;
+					}
 					break;
-				case AI.ExcuteRandomBehaviour:
+				case AI.ExectueRandomBehaviour:
+					{
+						var nextID = _behaviours[Random.RandomRange(0, _behaviours.Count)];
+						if (machine.ChangeState(nextID))
+						{
+							_behaviourTimer = Random.RandomRange(_behaviourTimeMin, _behaviourTimeMax);
+							_horizontal = Random.Range(-1.0f, 1.0f);
+							_ai = AI.WaitUntilBehaviour;
+						}
+						else
+							_ai = AI.Think;
+					}
 					break;
-				case AI.WaitUnitBehaviour:
+				case AI.WaitUntilBehaviour:
+					{
+						if (_behaviourTimer <= 0.0f)
+							_ai = AI.Think;
+						else
+							_behaviourTimer -= Time.deltaTime;
+					}
 					break;
 				case AI.Follow:
-					if (_target == null)
 					{
-						_ai = AI.Think;
-						break;
+						// 타겟 없으면 다시생각해
+						if (_target == null)
+						{
+							_ai = AI.Think;
+							return;
+						}
+
+						if(Vector2.Distance(transform.position, _target.position) > _targetDetectRange)
+						{
+							_target = null;
+							_ai = AI.Think;
+							return;
+						}
+
+						// 타겟이 오른쪽에 있으면 오른쪽으로
+						if (transform.position.x < _target.position.x - _trigger.size.x)
+						{
+							_horizontal = 1.0f;
+						}
+						// 타겟이 왼쪽에 있으면 왼쪽으로
+						else if (transform.position.x > _target.position.x + _trigger.size.x)
+						{
+							_horizontal = -1.0f;
+						}
+
+						// 공격 가능하면서 공격 범위 내에 타겟이 있다면 공격, 아니면 타겟으로 이동
+						if (_attackEnabled &&
+							Vector2.Distance(transform.position, _target.position) <= _attackRange)
+						{
+							machine.ChangeState(CharacterStateID.Attack);
+						}
+						else
+						{
+							machine.ChangeState(CharacterStateID.Move);
+						}
 					}
-
-
-
-					// 타겟이 오른쪽에 있으면 오른쪽으로
-					if (transform.position.x < _target.position.x - _trigger.size.x)
-						_horizontal = 1.0f;
-					//타겟이 왼쪽에 있으면 왼쪽으로
-					if (transform.position.x > _target.position.x + _trigger.size.x)
-						_horizontal = -1.0f;
-
-					
-
-					if (!isForwardGroundDetect)
-					{
-						machine.ChangeState(CharacterStateID.Idle);
-						return;
-					}
-
-					if (_attackEnabled && Vector2.Distance(transform.position, _target.position) <= _attackRange)
-						machine.ChangeState(CharacterStateID.Attack);
-					else
-						machine.ChangeState(CharacterStateID.Move);
-
 					break;
 				default:
 					break;
 			}
 		}
 
-		protected override void OnDrawGizmosSelected()
+		protected override void FixedUpdate()
 		{
-			base.OnDrawGizmosSelected();
-			Gizmos.color = Color.yellow;
-			Gizmos.DrawWireSphere(transform.position, _targetDetectRange);
-
-			Gizmos.color = Color.red;
-			Gizmos.DrawSphere(transform.position, _attackRange);
-
-			Gizmos.color = isForwardGroundDetect ? Color.green : Color.red;
-			Vector3 forwardDetectStartPos = transform.position + new Vector3(_forwardGroundDetectOffset.x * direction, _forwardGroundDetectOffset.y);
-			Vector3 forwardDetectEndPos = forwardDetectStartPos + Vector3.down * _forwardGroundDetectDistance;
-
-			Gizmos.DrawLine(forwardDetectStartPos, forwardDetectEndPos);
+			if (machine.currentStateID != CharacterStateID.Move)
+			{
+				base.FixedUpdate();
+			}
+			else
+			{
+				machine.FixedUpdateState();
+				// 한 프레임당 이동 거리 = 속력 * 한 프레임당 걸린 시간
+				Vector2 expected = rigidbody.position + move * Time.fixedDeltaTime;
+				float distanceX = Mathf.Abs(expected.x - rigidbody.position.x);
+				float height = distanceX * Mathf.Tan(_slopeAngle * Mathf.Deg2Rad);
+				Vector2 origin = expected + Vector2.up * height;
+				RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.down, height * 2.0f, groundMask);
+				if (hit.collider)
+				{
+					rigidbody.position = hit.point;
+				}
+			}
 		}
 
 		public override void DepleteHp(object subject, float amount)
 		{
 			base.DepleteHp(subject, amount);
+
+			//int a = 1;
+			//Type type = a.GetType(); // GetType() 함수는 값의 멤버함수접근으로 호출해서 해당 값의 타입을 정보 객체를 반환
+			//type = typeof(EnemyController); // typeof 키워드는 어떤 타입의 정보를 가지는 객체를 반환
+
 			if (subject.GetType().Equals(typeof(Transform)))
-			{
-				Transform target = (Transform)subject;
-				float dir = target.position.x - transform.position.x < 0 ? 1.0f : -1.0f;
-				Knockback(Vector2.right * dir * 1.0f);
-			}
+				Knockback(Vector2.right * (((Transform)subject).position.x - transform.position.x < 0 ? 1.0f : -1.0f) * 1.0f);
 		}
 
 		private void OnTriggerStay2D(Collider2D collision)
@@ -154,19 +188,21 @@ namespace Platfomer.Controllers
 			{
 				if (collision.TryGetComponent(out IHP target))
 				{
-					if (!target.invincible)
-						target.DepleteHp(transform, Random.RandomRange(damageMin, damageMax));
+					if (target.invincible == false)
+						target.DepleteHp(transform, Random.Range(damageMin, damageMax));
 				}
 			}
 		}
 
-		protected override void Move()
+		protected override void OnDrawGizmosSelected()
 		{
-			if(isForwardGroundDetect)
-				base.Move();
+			base.OnDrawGizmosSelected();
+
+			Gizmos.color = Color.yellow;
+			Gizmos.DrawWireSphere(transform.position, _targetDetectRange);
+
+			Gizmos.color = Color.red;
+			Gizmos.DrawWireSphere(transform.position, _attackRange);
 		}
-
 	}
-
 }
-

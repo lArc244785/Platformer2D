@@ -24,8 +24,8 @@ namespace Platformer.Controllers
 			machine = new PlayerMachine(this);
 			var machineData = StateMachineDataSheet.GetPlayerData(machine);
 			machine.Init(machineData);
-			OnHpMin += () => machine.ChangeState(CharacterStateID.Die);
-			OnHpDepleted += (x) => machine.ChangeState(CharacterStateID.Hurt);
+			onHpMin += () => machine.ChangeState(CharacterStateID.Die);
+			onHpDepleted += (x) => machine.ChangeState(CharacterStateID.Hurt);
 		}
 
 		protected override void Update()
@@ -79,23 +79,12 @@ namespace Platformer.Controllers
 					machine.ChangeState(CharacterStateID.Idle);
 			}
 
-			if (Input.GetKeyDown(KeyCode.D))
-				OnDamage(1);
-
 			if (Input.GetKeyDown(KeyCode.LeftShift))
 				machine.ChangeState(CharacterStateID.Dash);
 
 			if (Input.GetKey(KeyCode.LeftControl))
 				machine.ChangeState(CharacterStateID.Attack);
 
-		}
-
-		private void OnDamage(float amount)
-		{
-			if (invincible)
-				return;
-
-			DepleteHp(null, 1);
 		}
 
 		public override void DepleteHp(object subject, float amount)
