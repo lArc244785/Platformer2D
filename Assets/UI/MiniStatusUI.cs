@@ -14,6 +14,7 @@ public class MiniStatusUI : MonoBehaviour
 	{
 		var hp = transform.root.GetComponent<IHP>();
 
+
 		_slider.minValue = hp.hpMin;
 		_slider.maxValue = hp.hpMax;
 		_slider.value = hp.hpValue;

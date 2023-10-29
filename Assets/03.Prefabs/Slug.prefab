@@ -429,7 +429,7 @@ MonoBehaviour:
   hasJumped: 0
   hasDoubleJumped: 0
   _hpMax: 50
-  poolOfDamagePopUp: {fileID: 0}
+  poolOfDamagePopUpID: EnemyDamagePopUp
   _ai: 0
   _targetDetectRange: 1.5
   _autoFollow: 1

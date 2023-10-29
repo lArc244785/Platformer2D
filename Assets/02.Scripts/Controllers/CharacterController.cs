@@ -1,6 +1,7 @@
 using Platformer.Effects;
 using Platformer.FSM;
 using Platformer.GameElements;
+using Platformer.ObjectPools;
 using Platformer.Stats;
 using System;
 using System.Linq;
@@ -208,7 +209,7 @@ namespace Platformer.Controllers
 		public event Action onHpMax;
 		public event Action onHpMin;
 
-		public PoolOfDamagePopUp poolOfDamagePopUp;
+		[SerializeField] private string poolOfDamagePopUpID;
 
 		public void Stop()
 		{
@@ -350,15 +351,24 @@ namespace Platformer.Controllers
 			hpValue -= amount;
 			onHpDepleted?.Invoke(amount);
 
-			var damagePopUp = poolOfDamagePopUp.pool.Get();
+
+			DamagePopUp damagePopUp = ObjectPoolManager.instance.Get(poolOfDamagePopUpID).GetComponent<DamagePopUp>();
 			damagePopUp.transform.position = transform.position + Vector3.up * 0.5f;
 			damagePopUp.Show(amount);
+
+			//var damagePopUp = poolOfDamagePopUp.pool.Get();
+			//damagePopUp.Show(amount);
 		}
 
 		public void Knockback(Vector2 forece)
 		{
 			rigidbody.velocity = Vector2.zero;
 			rigidbody.AddForce(forece, ForceMode2D.Impulse);
+		}
+
+		public void NoEventSetHp(float value)
+		{
+			_hp = value;
 		}
 
 	}

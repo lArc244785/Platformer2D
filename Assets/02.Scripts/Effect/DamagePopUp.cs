@@ -31,7 +31,6 @@ namespace Platformer.Effects
 
 		public void Show(float amount)
 		{
-			Debug.Log(gameObject.activeSelf);
 			_color = _orginColor;
 			_amount.text = ((int)amount).ToString();
 		}

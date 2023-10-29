@@ -39,6 +39,12 @@ namespace Platformer.Controllers
 
 		private CapsuleCollider2D _trigger;
 
+		public void Init()
+		{
+			NoEventSetHp(hpMax);
+			//machine?.ChangeState(CharacterStateID.Idle);
+		}
+
 		protected override void Awake()
 		{
 			base.Awake();
@@ -113,7 +119,7 @@ namespace Platformer.Controllers
 							return;
 						}
 
-						if(Vector2.Distance(transform.position, _target.position) > _targetDetectRange)
+						if (Vector2.Distance(transform.position, _target.position) > _targetDetectRange)
 						{
 							_target = null;
 							_ai = AI.Think;
