@@ -1,7 +1,6 @@
 using Platformer.Effects;
 using Platformer.FSM;
 using Platformer.GameElements;
-using Platformer.ObjectPools;
 using Platformer.Stats;
 using System;
 using System.Linq;
@@ -219,12 +218,21 @@ namespace Platformer.Controllers
 
 		protected virtual void Awake()
 		{
-			_hp = _hpMax;
 			rigidbody = GetComponent<Rigidbody2D>();
 			_col = GetComponent<CapsuleCollider2D>();
+			_hp = _hpMax;
 		}
 
 		protected virtual void Start() { }
+
+		public virtual void SetUp()
+		{
+			hpValue = hpMax;
+			var renderer = GetComponentInChildren<SpriteRenderer>();
+			Color color = renderer.color;
+			color.a = 1.0f;
+			renderer.color = color;
+		}
 
 		protected virtual void Update()
 		{
@@ -350,14 +358,6 @@ namespace Platformer.Controllers
 
 			hpValue -= amount;
 			onHpDepleted?.Invoke(amount);
-
-
-			DamagePopUp damagePopUp = ObjectPoolManager.instance.Get(poolOfDamagePopUpID).GetComponent<DamagePopUp>();
-			damagePopUp.transform.position = transform.position + Vector3.up * 0.5f;
-			damagePopUp.Show(amount);
-
-			//var damagePopUp = poolOfDamagePopUp.pool.Get();
-			//damagePopUp.Show(amount);
 		}
 
 		public void Knockback(Vector2 forece)
