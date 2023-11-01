@@ -17,12 +17,17 @@ namespace Platformer.GameElements
         [SerializeField] private float _delay;
         [SerializeField] private LayerMask _spawnPointMask;
         private IObjectPool<GameObject> _pool;
-        
+
 
         private void Start()
         {
             _pool = PoolManager.instance.GetPool(_poolTag);
             StartCoroutine(SpawnAll());
+        }
+
+        private void OnApplicationQuit()
+        {
+            StopAllCoroutines();
         }
 
         private void OnDisable()
@@ -41,7 +46,7 @@ namespace Platformer.GameElements
         }
 
         private IEnumerator Spawn()
-        {           
+        {
             yield return new WaitForSeconds(_delay);
 
             int count = TRY_COUNT_MAX;

@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Platformer.Controllers
 {
-	public abstract class CharacterController : MonoBehaviour, IHP
+	public abstract class CharacterController : MonoBehaviour, IHp
 	{
 		public float damageMin;
 		public float damageMax;
@@ -223,6 +223,11 @@ namespace Platformer.Controllers
 
 		protected virtual void Start() { }
 
+		private void OnDisable()
+		{
+			machine.ChangeStateForcely(CharacterStateID.Idle);
+		}
+
 		public virtual void SetUp()
 		{
 			hpValue = hpMax;
@@ -230,7 +235,6 @@ namespace Platformer.Controllers
 			Color color = renderer.color;
 			color.a = 1.0f;
 			renderer.color = color;
-			machine.ChangeState(CharacterStateID.Idle);
 		}
 
 		protected virtual void Update()

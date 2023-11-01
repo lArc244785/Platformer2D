@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dff437b9032e8154b948120c050ba67d, type: 3}
+  m_Script: {fileID: 11500000, guid: 15542844a35dc29479ace7bae0cf10d1, type: 3}
   m_Name: PlayerAttack1
   m_EditorClassIdentifier: 
   targetMax: 1
@@ -17,6 +17,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 32768
   damageGain: 1
-  castCenter: {x: 0.22, y: 0.15}
-  castSize: {x: 0.3, y: 0.3}
-  castDistance: 0.3
+  castCenter: {x: 0, y: 0.14}
+  castSize: {x: 0.3, y: 0.6}
+  castDistance: 0.4

@@ -2,7 +2,7 @@ using System;
 
 namespace Platformer.Stats
 {
-	public interface IHP
+	public interface IHp
 	{
 		bool invincible { get; set; }
 		float hpValue { get; set; }

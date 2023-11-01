@@ -65,6 +65,11 @@ namespace Platformer.Controllers
 
 		private void UpdateAI()
 		{
+			if (machine.currentStateID == CharacterStateID.Hurt ||
+				machine.currentStateID == CharacterStateID.Die ||
+				machine.currentStateID == CharacterStateID.Attack)
+				return;
+
 			// 자동 따라가기 옵션이 켜져있는데
 			if (_autoFollow)
 			{
@@ -200,7 +205,7 @@ namespace Platformer.Controllers
 		{
 			if ((1 << collision.gameObject.layer & _targetMask) > 0)
 			{
-				if (collision.TryGetComponent(out IHP target))
+				if (collision.TryGetComponent(out IHp target))
 				{
 					if (target.invincible == false)
 						target.DepleteHp(transform, Random.Range(damageMin, damageMax));
