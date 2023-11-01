@@ -1,6 +1,8 @@
 using Platformer.Effects;
 using Platformer.FSM;
 using Platformer.GameElements;
+using Platformer.GameElements.Pool;
+using Platformer.GameElements.Pool.Generic;
 using Platformer.Stats;
 using System.Collections.Generic;
 using UnityEngine;
@@ -41,10 +43,10 @@ namespace Platformer.Controllers
 
 		private CapsuleCollider2D _trigger;
 
-		public void Init()
+		public override void SetUp()
 		{
-			NoEventSetHp(hpMax);
-			//machine?.ChangeState(CharacterStateID.Idle);
+			base.SetUp();
+			_trigger.enabled = true;
 		}
 
 		protected override void Awake()
@@ -182,20 +184,13 @@ namespace Platformer.Controllers
 		{
 			base.DepleteHp(subject, amount);
 
-			//int a = 1;
-			//Type type = a.GetType(); // GetType() 함수는 값의 멤버함수접근으로 호출해서 해당 값의 타입을 정보 객체를 반환
-			//type = typeof(EnemyController); // typeof 키워드는 어떤 타입의 정보를 가지는 객체를 반환
-
 			if (subject.GetType().Equals(typeof(Transform)))
 				Knockback(Vector2.right * (((Transform)subject).position.x - transform.position.x < 0 ? 1.0f : -1.0f) * 1.0f);
 
 			// DamagePopUp Pool 들을 관리하는 매니저를통해서
 			// Enemy 용 DamagePopUp Pool 을 가져오고 
 			// 가져온 Enemy 용 DamagePopUp Pool 에서 Item 을 가져온거
-			DamagePopUp damagePopUp = PoolManager<DamagePopUp>.instance
-										.GetPool<DamagePopUp>(PoolTag.DamagePopUP_Enemy)
-										.Get();
-
+			DamagePopUp damagePopUp = PoolManager.instance.Get<DamagePopUp>(PoolTag.DamagePopUP_Enemy);
 			damagePopUp.transform.position = transform.position + Vector3.up * 0.5f;
 			damagePopUp.Show(amount);
 

@@ -24,8 +24,6 @@ namespace Platformer.FSM
 				{ CharacterStateID.Hurt, new Hurt(machine)},
 				{ CharacterStateID.Die, new Die(machine)},
 				{ CharacterStateID.Dash, new Dash(machine)},
-				{ CharacterStateID.LadderUp, new LadderUp(machine)},
-				{ CharacterStateID.LadderDown, new LadderDown(machine)},
 				{ CharacterStateID.UpLadderClimb, new UpLadderClimb(machine)},
 				{ CharacterStateID.DownLadderClimb, new DownLadderClimb(machine)},
 				{ CharacterStateID.Attack, new Attack(machine, 0.5f,

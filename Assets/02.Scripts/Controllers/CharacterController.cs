@@ -208,8 +208,6 @@ namespace Platformer.Controllers
 		public event Action onHpMax;
 		public event Action onHpMin;
 
-		[SerializeField] private string poolOfDamagePopUpID;
-
 		public void Stop()
 		{
 			move = Vector2.zero; // ют╥б 0
@@ -232,6 +230,7 @@ namespace Platformer.Controllers
 			Color color = renderer.color;
 			color.a = 1.0f;
 			renderer.color = color;
+			machine.ChangeState(CharacterStateID.Idle);
 		}
 
 		protected virtual void Update()

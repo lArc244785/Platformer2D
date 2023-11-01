@@ -76,8 +76,8 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1082215261
-  m_SortingLayer: 0
+  m_SortingLayerID: -2112184295
+  m_SortingLayer: 8
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &1900727761505233256
@@ -181,6 +181,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 1966126209434639578}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 191ab515c0eb7fe4793af5f8a7ba17b0, type: 3}
+  m_Script: {fileID: 11500000, guid: 4e5b17b272557a64aa3da272f89da6ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

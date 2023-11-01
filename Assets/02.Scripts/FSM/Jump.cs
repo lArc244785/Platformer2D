@@ -30,9 +30,9 @@ namespace Platformer.FSM.Character
             controller.hasDoubleJumped = false;
             animator.Play("Jump");
 
-            float velocityX = (machine.prevStateID == CharacterStateID.WallSlide ||
-                               machine.prevStateID == CharacterStateID.UpLadderClimb ||
-                               machine.prevStateID == CharacterStateID.DownLadderClimb) ?
+            float velocityX = (machine.previousStateID == CharacterStateID.WallSlide ||
+                               machine.previousStateID == CharacterStateID.UpLadderClimb ||
+                               machine.previousStateID == CharacterStateID.DownLadderClimb) ?
                                (controller.horizontal * controller.moveSpeed) : rigidbody.velocity.x;
 
 			rigidbody.velocity = new Vector2(velocityX, 0.0f);

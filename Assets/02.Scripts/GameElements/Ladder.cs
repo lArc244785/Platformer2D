@@ -1,59 +1,56 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Platformer.GameElements
 {
+    public class Ladder : MonoBehaviour
+    {
+        public Vector2 top => (Vector2)transform.position +
+                              _bound.offset +
+                              Vector2.up * _bound.size.y / 2.0f;
+        public Vector2 bottom => (Vector2)transform.position +
+                                 _bound.offset +
+                                 Vector2.down * _bound.size.y / 2.0f;
 
-	public class Ladder : MonoBehaviour
-	{
-		public Vector2 top =>
-			(Vector2)transform.position + _bound.offset +
-			Vector2.up * _bound.size.y * 0.5f;
-		
-		public Vector2 bottom =>
-			(Vector2)transform.position + _bound.offset +
-			Vector2.down * _bound.size.y * 0.5f;
 
-		public Vector2 upEnter => bottom + Vector2.down * _upEnterOffset;
-		public Vector2 upExit => top + Vector2.down * _upExitOffset;
-		public Vector2 downEnter => top + Vector2.down * _downEnterOffset;
-		public Vector2 downExit => bottom + Vector2.down * _downExitOffset;
+        public Vector2 upEnter => bottom +
+                                  Vector2.down * _upEnterOffset;
 
-		public Vector2 groundEnter => bottom + Vector2.up * _groundOffset;
+        public Vector2 upExit => top +
+                                 Vector2.down * _upExitOffset;
 
-		public float centerX => transform.position.x + _bound.offset.x;
+        public Vector2 downEnter => top +
+                                    Vector2.down * _downEnterOffset;
 
-		[SerializeField] private float _upEnterOffset = 0.03f;
-		[SerializeField] private float _upExitOffset = 0.03f;
-		[SerializeField] private float _downEnterOffset = 0.05f;
-		[SerializeField] private float _downExitOffset = 0.05f;
-		[SerializeField] private float _groundOffset = 0f;
-		private BoxCollider2D _bound;
+        public Vector2 downExit => bottom +
+                                   Vector2.down * _downExitOffset;
 
-		private void Awake()
-		{
-			_bound = GetComponent<BoxCollider2D>();
-		}
+        [SerializeField] private float _upEnterOffset = 0.03f;
+        [SerializeField] private float _upExitOffset = 0.03f;
+        [SerializeField] private float _downEnterOffset = 0.05f;
+        [SerializeField] private float _downExitOffset = 0.05f;
+        private BoxCollider2D _bound;
 
-		private void OnDrawGizmos()
-		{
-			_bound = GetComponent<BoxCollider2D>();
-			Gizmos.color = Color.cyan;
+        private void Awake()
+        {
+            _bound = GetComponent<BoxCollider2D>();
+        }
 
-			DrawLine(0.08f, upEnter, Color.cyan);
-			DrawLine(0.08f, upExit, Color.cyan);
-			DrawLine(0.08f, downEnter, Color.magenta);
-			DrawLine(0.08f, downExit, Color.magenta);
-			DrawLine(0.08f, groundEnter, Color.red);
-		}
+        private void OnDrawGizmos()
+        {
+            _bound = GetComponent<BoxCollider2D>();
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawLine(upEnter + Vector2.left * 0.08f,
+                            upEnter + Vector2.right * 0.08f);
+            Gizmos.DrawLine(upExit + Vector2.left * 0.08f,
+                            upExit + Vector2.right * 0.08f);
 
-		private void DrawLine(float f, Vector2 pos, Color color)
-		{
-			Gizmos.color = color;
-			Gizmos.DrawLine(Vector2.left * f + pos, Vector2.right * f + pos);
-		}
-
-	}
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawLine(downEnter + Vector2.left * 0.08f,
+                            downEnter + Vector2.right * 0.08f);
+            Gizmos.DrawLine(downExit + Vector2.left * 0.08f,
+                            downExit + Vector2.right * 0.08f);
+        }
+    }
 }

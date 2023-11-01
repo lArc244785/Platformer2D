@@ -16,16 +16,18 @@ namespace Platformer.Controllers
 			if (_invincibleTimer < duration)
 				return;
 			_invincibleTimer = duration;
+			invincible = true;
 		}
 
-		protected override void Start()
+		protected override void Awake()
 		{
-			base.Start();
+			base.Awake();
 			machine = new PlayerMachine(this);
 			var machineData = StateMachineDataSheet.GetPlayerData(machine);
 			machine.Init(machineData);
+			onHpDepleted += (amount) => machine.ChangeState(CharacterStateID.Hurt);
 			onHpMin += () => machine.ChangeState(CharacterStateID.Die);
-			onHpDepleted += (x) => machine.ChangeState(CharacterStateID.Hurt);
+
 		}
 
 		protected override void Update()

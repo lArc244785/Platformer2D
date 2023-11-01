@@ -23,8 +23,6 @@ namespace Platformer.FSM
         EdgeClimb,
         Ladder,
         Dash,
-        LadderUp,
-        LadderDown,
 		Slide,
 		UpLadderClimb,
 		DownLadderClimb,
