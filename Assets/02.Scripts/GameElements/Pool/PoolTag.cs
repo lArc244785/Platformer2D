@@ -7,5 +7,7 @@ namespace Platformer.GameElements.Pool
         DamagePopUP_Enemy,
         Enemy_Slug,
         Enemy_Nepenthes,
+        Enemey_DarkNepenhes,
+        Projectile_DarkNepenthes,
     }
 }

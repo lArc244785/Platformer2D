@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dff437b9032e8154b948120c050ba67d, type: 3}
-  m_Name: NepenthesAttack
+  m_Name: DarkNepenthesAttack
   m_EditorClassIdentifier: 
-  targetMax: 1
+  targetMax: 0
   targetMask:
     serializedVersion: 2
     m_Bits: 1024
-  damageGain: 1
+  damageGain: 0
   castCenter: {x: 0, y: 0}
-  castSize: {x: 1, y: 1}
-  castDistance: 1
+  castSize: {x: 0, y: 0}
+  castDistance: 0

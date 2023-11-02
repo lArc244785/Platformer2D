@@ -77,7 +77,7 @@ namespace Platformer.FSM.Character
         {
             base.OnStateEnter();
             controller.isDirectionChangeable = false;
-            controller.isMovable = false; //controller.isGrounded;
+            controller.isMovable = false; 
             _hasHit = false;
 
             SkillCastSetting setting = _attackSettings[_comboStack];
